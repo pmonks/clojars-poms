@@ -52,7 +52,7 @@
 (println "ℹ️ Top 10 most depended-upon projects:\n *" (s/join "\n * " (take 10 (map first (sort-by #(count (val %)) > inverted-dependencies)))))
 
 ; Build a Loom graph
-(def g (apply g/graph dependencies))
+(def g (apply g/digraph dependencies))
 
 (println "ℹ️ Dependencies are a DAG?" (galg/dag? g))
 
