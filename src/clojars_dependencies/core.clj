@@ -5,16 +5,20 @@
             [clojure.zip          :as zip]
             [clojure.data.zip.xml :as zip-xml]
             [version-clj.core     :as ver]
-            [loom.graph           :as graph]))
+            [loom.graph           :as g]))
 
 (defn rsync
   [& args]
-  (let [exit-code (-> (ProcessBuilder. (cons "rsync" args))
+  (let [exit-code (-> (ProcessBuilder. ^java.util.List (cons "rsync" args))
                       (.inheritIO)
                       (.start)
                       (.waitFor))]
     (if (not= 0 exit-code)
       (throw (Exception. "rsync failed - see stderr for details")))))
+
+(defn rsync-poms
+  [source target]
+  (rsync "-zarv" "--prune-empty-dirs" "--delete" "--include=*/" "--include=*.pom" "--exclude=*" source target))
 
 (defn cljgav
   "Parses a POM XML element containing a Maven GAV, and returns it in Clojure format: [\"[groupId/]artifactId\" \"versionStr\"]."
@@ -28,6 +32,7 @@
         [artifact-id version]))))
 
 (defn parse-pom-file
+  "Parses a single POM file (a java.io.File) into the structure: [projectCljGAV [dependencyCljGAVs, ...]] (see cljgav for the format of each CLJGAV)."
   [^java.io.File pom-file]
   (try
     ; We do all of this because some of the POMs in Clojars are invalid in ways that are trivial to fix (leading whitespace, BOM, invalid UTF-8 byte sequences)
@@ -46,3 +51,28 @@
     (catch Exception e
       (print (str "⚠️ Unable to parse POM " (.getName pom-file) ": " e "\n"))
       (flush))))
+
+(defn parse-pom-files
+  "Parses all POM files in the given directory, and returns a sequence of parsed POMs (see parse-pom-file for the format of each entry in the sequence)."
+  [poms-directory]
+  (let [pom-files (filter #(and (.endsWith (.getName ^java.io.File %) ".pom")
+                                 (.canRead ^java.io.File %)
+                                 (not (.isDirectory ^java.io.File %)))
+                           (file-seq (io/file poms-directory)))]
+    (remove nil? (pmap parse-pom-file pom-files))))  ; Just watch pmap light those CPUs up!
+
+(defn latest-project-versions
+  "Filters out all but the latest version of each project (based on how version-clj compares Maven version strings)."
+  [parsed-pom-files]
+  (let [grouped-projects (group-by #(first (first %)) parsed-pom-files)]
+    (pmap #(last (sort-by (fn [p] (second (first p))) ver/version-compare (second %))) grouped-projects)))
+
+(defn dependencies
+  "Returns a sequence of dependency pairs, in [fromCljGAV toCljGAV] format."
+  [latest-project-versions]
+  (let [version-numbers-elided (pmap #(vec [(first (first %)) (map first (second %))]) latest-project-versions)]
+    (for [project version-numbers-elided
+          from    [(first project)]
+          to      (second project)]
+      [from to])))
+
