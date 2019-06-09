@@ -1,6 +1,7 @@
 [![Open Issues](https://img.shields.io/github/issues/pmonks/clojars-dependencies.svg)](https://github.com/pmonks/clojars-dependencies/issues)
+![GitHub last commit](https://img.shields.io/github/last-commit/pmonks/clojars-dependencies.svg)
 [![License](https://img.shields.io/github/license/pmonks/clojars-dependencies.svg)](https://github.com/pmonks/clojars-dependencies/blob/master/LICENSE)
-[![Dependencies Status](https://versions.deps.co/pmonks/clojars-dependencies/status.svg)](https://versions.deps.co/pmonks/clojars-dependencies)
+<!-- [![Dependencies Status](https://versions.deps.co/pmonks/clojars-dependencies/status.svg)](https://versions.deps.co/pmonks/clojars-dependencies) -->
 
 # clojars-dependencies
 
