@@ -49,7 +49,7 @@
 (def inverted-dependencies (group-by second dependencies))
 
 (println "ℹ️ Consumers of version-clj/version-clj:\n *" (s/join "\n * " (sort (map first (get inverted-dependencies "version-clj/version-clj")))))
-(println "ℹ️ Top 10 most depended-upon projects:\n *" (s/join "\n * " (take 10 (map first (sort-by #(count (val %)) > inverted-dependencies)))))
+(println "ℹ️ Top 25 most depended-upon projects:\n *" (s/join "\n * " (take 25 (map first (sort-by #(count (val %)) > inverted-dependencies)))))
 
 ; Build a Loom graph
 (def g (apply g/digraph dependencies))
