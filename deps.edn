@@ -8,7 +8,7 @@
                                                         :sha "b48d4e7000586529f81c1e29069b503b57259514"}}
                           :main-opts ["-m" "clj-check.check"]}                          ; clj -A:check
            :test         {:extra-paths ["test"]}
-           :ancient      {:extra-deps {olical/depot {:mvn/version "1.8.2"}}             ; clj -A:ancient    Note: doesn't work due to https://github.com/Olical/depot/issues/23
+           :ancient      {:extra-deps {olical/depot {:mvn/version "1.8.4"}}             ; clj -A:ancient    Note: doesn't work due to https://github.com/Olical/depot/issues/23
                           :main-opts  ["-m" "depot.outdated.main"]}
            :uberjar      {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}    ; clj -A:uberjar
                           :main-opts  ["-m" "cambada.uberjar"
