@@ -1,7 +1,7 @@
 {:deps    {org.clojure/clojure              {:mvn/version "1.10.1"}
            org.clojure/data.zip             {:mvn/version "0.1.3"}
            version-clj                      {:mvn/version "0.1.2"}
-           org.owasp/dependency-check-maven {:mvn/version "4.0.2"}
+           org.owasp/dependency-check-maven {:mvn/version "5.2.1"}
            aysylu/loom                      {:mvn/version "1.0.2"}
           }
  :aliases {:check        {:extra-deps {athos/clj-check {:git/url "https://github.com/athos/clj-check.git"
