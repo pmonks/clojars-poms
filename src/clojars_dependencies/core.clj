@@ -53,7 +53,7 @@
   [^java.io.File pom-file]
   (try
     ; We do all of this because some of the POMs in Clojars are invalid in ways that are trivial to fix (leading whitespace, BOM, invalid UTF-8 byte sequences)
-    (let [xml-decoder     (doto (.newDecoder java.nio.charset.StandardCharsets/UTF_8)
+    (let [xml-decoder     (doto (.newDecoder            java.nio.charset.StandardCharsets/UTF_8)
                                 (.onMalformedInput      java.nio.charset.CodingErrorAction/REPLACE)
                                 (.onUnmappableCharacter java.nio.charset.CodingErrorAction/REPLACE))
           xml-is          (org.owasp.dependencycheck.xml.XmlInputStream.                           ; Strip leading whitespace, BOM, etc.
