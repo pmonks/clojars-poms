@@ -1,19 +1,39 @@
-{:deps    {org.clojure/clojure              {:mvn/version "1.10.1"}
-           org.clojure/data.zip             {:mvn/version "0.1.3"}
-           version-clj                      {:mvn/version "0.1.2"}
-           org.owasp/dependency-check-maven {:mvn/version "5.2.1"}
-           aysylu/loom                      {:mvn/version "1.0.2"}
-          }
- :aliases {:check        {:extra-deps {athos/clj-check {:git/url "https://github.com/athos/clj-check.git"
-                                                        :sha "b48d4e7000586529f81c1e29069b503b57259514"}}
-                          :main-opts ["-m" "clj-check.check"]}                          ; clj -A:check
-           :test         {:extra-paths ["test"]}
-           :ancient      {:extra-deps {olical/depot {:mvn/version "1.8.4"}}             ; clj -A:ancient    Note: doesn't work due to https://github.com/Olical/depot/issues/23
-                          :main-opts  ["-m" "depot.outdated.main"]}
-           :uberjar      {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}    ; clj -A:uberjar
-                          :main-opts  ["-m" "cambada.uberjar"
-                                       "-m" "clojars-dependencies.main"]}
-           :native-image {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}    ; clj -A:native-image
-                          :main-opts  ["-m" "cambada.native-image"
-                                       "-m" "clojars-dependencies.main"]}
-           }}
+;
+; Copyright © 2019 Peter Monks
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
+; SPDX-License-Identifier: Apache-2.0
+;
+
+{:deps {org.clojure/clojure              {:mvn/version "1.10.3"}
+        org.clojure/data.zip             {:mvn/version "1.0.0"}
+        version-clj/version-clj          {:mvn/version "2.0.2"}
+        org.owasp/dependency-check-maven {:mvn/version "6.5.3"}
+        aysylu/loom                      {:mvn/version "1.0.2"}}
+ :aliases {
+    ; clj -M:check
+    :check    {:extra-deps {com.github.athos/clj-check {:git/sha "518d5a1cbfcd7c952f548e6dbfcb9a4a5faf9062"}}
+               :main-opts  ["-m" "clj-check.check"]}
+    ; clj -M:outdated
+    :outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "1.4.0"}}
+               :main-opts ["-m" "antq.core"]}
+    ; clj -M:kondo
+    :kondo
+      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.02.09"}}
+       :main-opts  ["-m" "clj-kondo.main" "--lint" "src" "resources"]}
+    ; clj -M:eastwood
+    :eastwood
+      {:extra-deps {jonase/eastwood {:mvn/version "1.2.2"}}
+       :main-opts  ["-m" "eastwood.lint" {:source-paths ["src" "resources"]}]}
+    }}
