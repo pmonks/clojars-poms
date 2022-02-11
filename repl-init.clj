@@ -36,22 +36,20 @@
 (require '[clojars-dependencies.core :as cd] :reload-all)
 (require '[spinner.core              :as spin])
 
-; Change this with caution - sync'ing from Clojars takes a while...
-(def force-sync false)
+(def prevent-sync false)
 
 (def poms-directory "./poms")
 (def clojars-poms-directory "./poms/clojars")
 
 ; REPL state setup...
-(if (or force-sync
-        (not (.exists (io/file clojars-poms-directory))))
+(if prevent-sync
+  (println "ℹ️ Skipping sync")
   (do
-    (println "ℹ️ POM files not found (or force sync enabled) - syncing all POMs from Clojars")
     (io/make-parents clojars-poms-directory)
-    (print "ℹ️ Downloading POMs... ")
-    (spin/spin! (fn [] (cd/sync-clojars-poms! clojars-poms-directory)))   ; This takes a long time...
-    (println "\nℹ️ Done"))
-  (println "ℹ️ Skipping sync - POM files already present (and force sync disabled)"))
+    (print "ℹ️ Syncing POMs from Clojars... ")
+    (if (spin/spin! (fn [] (cd/sync-clojars-poms! clojars-poms-directory)))   ; This may take a long time...
+      (println "\nℹ️ Done - updated POMs synced")
+      (println "\nℹ️ Done - no changes"))))
 
 (print "ℹ️ Parsing POMs... ")
 (def parsed-poms (cd/parse-pom-files poms-directory))   ; Should use a spinner here, but the JVM's idiotic "illegal reflection" warning seems to screw up jansi

@@ -91,13 +91,15 @@
 
 ; Note: doesn't support deletion (though Clojars itself may not allow deletion anyway? 🤔)
 (defn sync-clojars-poms!
-  "Syncs all POMs from Clojars to the target directory."
+  "Syncs all POMs from Clojars to the target directory. Returns true if there were changes, false if not."
   [target]
-  (download-file-from-clojars! target all-poms-list)
-  (let [all-poms-file (str target "/" all-poms-list)
-        all-pom-paths (map #(s/replace-first % "./" "") (with-open [r (io/reader all-poms-file)] (doall (line-seq r))))]
-    (doall (pmap (partial download-file-from-clojars! target) all-pom-paths)))
-  nil)
+  (if (download-file-from-clojars! target all-poms-list)
+    ; Only sync POMs if the master list changed
+    (let [all-poms-file (str target "/" all-poms-list)
+          all-pom-paths (map #(s/replace-first % "./" "") (with-open [r (io/reader all-poms-file)] (doall (line-seq r))))]
+      (doall (pmap (partial download-file-from-clojars! target) all-pom-paths))
+      true)
+    false))
 
 ; Note: clojars dropped support for rsync in 2019 - see https://github.com/clojars/clojars-web/issues/735
 (comment
@@ -116,7 +118,7 @@
 )
 
 (defn cljgav
-  "Parses a POM XML element containing a Maven GAV, and returns it in Clojure format: [\"[groupId/]artifactId\" \"versionStr\"]."
+  "Parses a POM XML element containing a Maven GAV, and returns it in Leiningen format: [\"[groupId/]artifactId\" \"versionStr\"]."
   [root]
   (let [group-id    (zip-xml/xml1-> root      :groupId    zip-xml/text)
         artifact-id (zip-xml/xml1-> root      :artifactId zip-xml/text)
@@ -154,7 +156,7 @@
                                  (.canRead ^java.io.File %)
                                  (not (.isDirectory ^java.io.File %)))
                            (file-seq (io/file poms-directory)))]
-    (remove nil? (pmap parse-pom-file pom-files))))  ; Just watch pmap light those CPUs up!
+    (remove nil? (pmap parse-pom-file pom-files))))
 
 (defn latest-project-versions
   "Filters out all but the latest version of each project (based on how version-clj compares Maven version strings)."
