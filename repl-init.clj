@@ -1,6 +1,5 @@
 ;
 ; Copyright 2019 Peter Monks
-; SPDX-License-Identifier: Apache-2.0
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
@@ -14,6 +13,7 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 ;
+; SPDX-License-Identifier: Apache-2.0
 
 ;
 ; This script is intended to be used to initialise a clj REPL set up for easy experimentation with this project.
@@ -23,7 +23,6 @@
 ;     clj -i repl-init.clj -r
 ;
 
-(require '[clojure.repl              :refer :all])
 (require '[clojure.pprint            :as pp :refer [pprint]])
 (require '[clojure.string            :as s])
 (require '[clojure.java.io           :as io])
@@ -35,43 +34,49 @@
 (require '[loom.alg                  :as galg])
 (require '[loom.io                   :as gio])
 (require '[clojars-dependencies.core :as cd] :reload-all)
+(require '[spinner.core              :as spin])
 
-; Change this with caution - rsync'ing from Clojars takes a while and may tax clojars.org's rsync server...
-(def force-rsync false)
+; Change this with caution - sync'ing from Clojars takes a while...
+(def force-sync false)
 
 (def poms-directory "./poms")
 (def clojars-poms-directory "./poms/clojars")
 
 ; REPL state setup...
-(if (or force-rsync
+(if (or force-sync
         (not (.exists (io/file clojars-poms-directory))))
   (do
-    (println "ℹ️ POM files not found (or force rsync enabled) - rsyncing all POMs from Clojars")
+    (println "ℹ️ POM files not found (or force sync enabled) - syncing all POMs from Clojars")
     (io/make-parents clojars-poms-directory)
-    (cd/rsync-poms "clojars.org::clojars" clojars-poms-directory))   ; This takes a long time...
-  (println "ℹ️ Skipping rsync - POM files already present"))
+    (print "ℹ️ Downloading POMs... ")
+    (spin/spin! (fn [] (cd/sync-clojars-poms! clojars-poms-directory)))   ; This takes a long time...
+    (println "\nℹ️ Done"))
+  (println "ℹ️ Skipping sync - POM files already present (and force sync disabled)"))
 
-(def parsed-poms (cd/parse-pom-files poms-directory))
-(println "ℹ️ Parsed" (count parsed-poms) "POMs")
+(print "ℹ️ Parsing POMs... ")
+(def parsed-poms (cd/parse-pom-files poms-directory))   ; Should use a spinner here, but the JVM's idiotic "illegal reflection" warning seems to screw up jansi
+(println "\nℹ️ Parsed" (count parsed-poms) "POMs")
 
 (def latest-versions-only (cd/latest-project-versions parsed-poms))
 (println "ℹ️ Found" (count latest-versions-only) "unique projects")
 
 (def dependencies (cd/dependencies latest-versions-only))
-(println "ℹ️ Found" (count dependencies) "unique dependencies")
+(println "ℹ️ Found" (count dependencies) "unique dependencies amongst latest versions")
 
 
 ; Experiments go here...
 
-(def inverted-dependencies (group-by second dependencies))
+(def inverted-dependencies (group-by second dependencies))   ; This isn't correct...
+(def sample-library "version-clj/version-clj")
+(def consumers (seq (sort (map first (get inverted-dependencies sample-library)))))
 
-(println "ℹ️ Consumers of version-clj/version-clj:\n *" (s/join "\n * " (sort (map first (get inverted-dependencies "version-clj/version-clj")))))
-(println "ℹ️ Top 25 most depended-upon projects:\n *" (s/join "\n * " (take 25 (map first (sort-by #(count (val %)) > inverted-dependencies)))))
+(println "ℹ️ Consumers of" (str sample-library ":\n") (if consumers (doall (map (partial println "* ") consumers)) "- none -"))
+;(println "ℹ️ Top 25 most depended-upon projects:\n *" (s/join "\n * " (take 25 (map first (sort-by #(count (val %)) > inverted-dependencies)))))
 
 ; Build a Loom graph
-(def g (apply g/digraph dependencies))
+;(def g (apply g/digraph dependencies))
 
-(println "ℹ️ Dependencies are a DAG?" (galg/dag? g))
+;(println "ℹ️ Dependencies are a DAG?" (galg/dag? g))
 
 ;(def g (apply g/digraph edges))
 

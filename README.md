@@ -9,17 +9,19 @@ A little tool for exploring the dependencies between projects deployed to Clojar
 
 ## Installation
 
-For now the script isn't deployed anywhere, so best to clone this repo, then take a look at the source.
+For now the code isn't deployed anywhere, so best to clone this repo, then take a look at the source.
 
 If you've installed the [Clojure CLI tools](https://clojure.org/guides/getting_started#_clojure_installer_and_cli_tools) you can run the sample script and be dropped in a REPL via:
 
 ```shell
-$ clj -i repl-init.clj -r
+$ clojure -i repl-init.clj -r
 ```
 
-Note that the first time this script is run it will pull down approximately 950MB of POMs from clojars.org (using `rsync`), which can take 10 or more minutes depending on your network connection.
+Note: the `repl-init.clj` script uses the [spinner](https://github.com/pmonks/spinner) library, which isn't compatible with the `clj` command line script.
 
-On every run, the script parses all of those XML files (approximately 180,000 of them, as of mid-2019), which also takes quite a bit of time.  Look at the source for more details on what the script sets up for you to experiment with.
+The first time this script is run it will pull down all POMs from clojars.org, which can take an hour or more depending on your network connection.  As of early 2022, this is 250,000 files totalling over 2.2GB.
+
+Look at [`repl-init.clj`](https://github.com/pmonks/clojars-dependencies/blob/master/repl-init.clj) for more details on what the script sets up and how you can experiment with this data.
 
 ## Developer Information
 
