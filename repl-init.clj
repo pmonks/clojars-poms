@@ -20,7 +20,9 @@
 ;
 ; Use:
 ;
-;     clj -i repl-init.clj -r
+;     clojure -i repl-init.clj -r
+;
+; Note: do NOT use `clj` to run this script, or you will see strange output behaviour
 ;
 
 (require '[clojure.pprint            :as pp :refer [pprint]])

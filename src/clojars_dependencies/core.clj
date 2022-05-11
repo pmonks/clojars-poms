@@ -72,6 +72,22 @@
                          (when-not (s/blank? last-modified) {:last-modified last-modified})))))
   nil)
 
+(defn- try-n-times
+  "Try f up to n times, with optional sleep in between - adapted from https://ericnormand.me/article/try-three-times"
+  ([f n] (try-n-times f n 0))
+  ([f n sleep-ms]
+    (if (zero? (dec n))
+      (f)
+      (try
+        (f)
+        (catch Throwable _
+          (when (pos? sleep-ms) (Thread/sleep sleep-ms))
+          (try-n-times f (dec n)))))))
+
+(defmacro ^:private try3sleep1
+  [& body]
+  `(try-n-times (fn [] ~@body) 3 1000))
+
 (defn download-file-from-clojars!
   "Downloads a single file (identified by file-path) from Clojars, to the specific target directory. Does nothing if the given file hasn't changed (as per ETag / If-None-Match). Returns true if the file was downloaded."
   [target file-path]
@@ -93,13 +109,15 @@
 (defn sync-clojars-poms!
   "Syncs all POMs from Clojars to the target directory. Returns true if there were changes, false if not."
   [target]
-  (if (download-file-from-clojars! target all-poms-list)
-    ; Only sync POMs if the master list changed
-    (let [all-poms-file (str target "/" all-poms-list)
-          all-pom-paths (map #(s/replace-first % "./" "") (with-open [r (io/reader all-poms-file)] (doall (line-seq r))))]
-      (doall (pmap (partial download-file-from-clojars! target) all-pom-paths))
-      true)
-    false))
+  ; First, get the list of all poms
+  (try3sleep1 (download-file-from-clojars! target all-poms-list))
+
+  ; Second, spin through the list, downloading all poms
+  (let [all-poms-file (str target "/" all-poms-list)
+        all-pom-paths (map #(s/replace-first % "./" "") (with-open [r (io/reader all-poms-file)] (doall (line-seq r))))]
+    (doall (pmap #(try3sleep1 (download-file-from-clojars! target %)) all-pom-paths))
+    true)
+  false)
 
 ; Note: clojars dropped support for rsync in 2019 - see https://github.com/clojars/clojars-web/issues/735
 (comment

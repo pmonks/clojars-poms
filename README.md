@@ -19,7 +19,7 @@ $ clojure -i repl-init.clj -r
 
 Note: the `repl-init.clj` script uses the [spinner](https://github.com/pmonks/spinner) library, which isn't compatible with the `clj` command line script.
 
-The first time this script is run it will pull down all POMs from clojars.org, which can take an hour or more depending on your network connection.  As of early 2022, this is 250,000 files totalling over 2.2GB.
+The first time this script is run it will pull down all POMs from clojars.org, which can take an hour or more depending on your network connection.  As of mid 2022, this is ~250,000 POM files (and the same amount of metadata files for caching purposes) totalling ~2.2GB.
 
 Look at [`repl-init.clj`](https://github.com/pmonks/clojars-dependencies/blob/master/repl-init.clj) for more details on what the script sets up and how you can experiment with this data.
 
