@@ -34,7 +34,7 @@
     :check    {:extra-deps {com.github.athos/clj-check {:git/sha "518d5a1cbfcd7c952f548e6dbfcb9a4a5faf9062"}}
                :main-opts  ["-m" "clj-check.check"]}
     ; clj -M:outdated
-    :outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "1.9.874"}}
+    :outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "2.0.889"}}
                :main-opts ["-m" "antq.core"]}
     ; clj -M:kondo
     :kondo
