@@ -21,14 +21,14 @@
         org.clojure/data.zip             {:mvn/version "1.0.0"}
         hato/hato                        {:mvn/version "0.8.2"}
         version-clj/version-clj          {:mvn/version "2.0.2"}
-        org.owasp/dependency-check-maven {:mvn/version "7.1.1"}
+        org.owasp/dependency-check-maven {:mvn/version "7.1.2"}
         aysylu/loom                      {:mvn/version "1.0.2"}
-        ch.qos.logback/logback-classic   {:mvn/version "1.2.11"}
-        org.slf4j/slf4j-api              {:mvn/version "1.7.36"}
-        org.slf4j/jcl-over-slf4j         {:mvn/version "1.7.36"}
-        org.slf4j/log4j-over-slf4j       {:mvn/version "1.7.36"}
-        org.slf4j/jul-to-slf4j           {:mvn/version "1.7.36"}
-        com.github.pmonks/spinner        {:mvn/version "2.0.120"}}
+        ch.qos.logback/logback-classic   {:mvn/version "1.4.0"}
+        org.slf4j/slf4j-api              {:mvn/version "2.0.0"}
+        org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.0"}
+        org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.0"}
+        org.slf4j/jul-to-slf4j           {:mvn/version "2.0.0"}
+        com.github.pmonks/spinner        {:mvn/version "2.0.190"}}
  :aliases {
     ; clj -M:check
     :check    {:extra-deps {com.github.athos/clj-check {:git/sha "518d5a1cbfcd7c952f548e6dbfcb9a4a5faf9062"}}
