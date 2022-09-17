@@ -28,7 +28,7 @@
         org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.1"}
         org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.1"}
         org.slf4j/jul-to-slf4j           {:mvn/version "2.0.1"}
-        com.github.pmonks/spinner        {:mvn/version "2.0.190"}}
+        com.github.pmonks/spinner        {:mvn/version "2.0.194"}}
  :aliases {
     ; clj -M:check
     :check    {:extra-deps {com.github.athos/clj-check {:git/sha "518d5a1cbfcd7c952f548e6dbfcb9a4a5faf9062"}}
