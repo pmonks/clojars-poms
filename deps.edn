@@ -24,10 +24,10 @@
         org.owasp/dependency-check-maven {:mvn/version "7.3.2"}
         aysylu/loom                      {:mvn/version "1.0.2"}
         ch.qos.logback/logback-classic   {:mvn/version "1.4.5"}
-        org.slf4j/slf4j-api              {:mvn/version "2.0.4"}
-        org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.4"}
-        org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.4"}
-        org.slf4j/jul-to-slf4j           {:mvn/version "2.0.4"}
+        org.slf4j/slf4j-api              {:mvn/version "2.0.5"}
+        org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.5"}
+        org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.5"}
+        org.slf4j/jul-to-slf4j           {:mvn/version "2.0.5"}
         com.github.pmonks/spinner        {:mvn/version "2.0.194"}}
  :aliases {
     ; clj -M:check
