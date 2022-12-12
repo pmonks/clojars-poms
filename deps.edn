@@ -21,7 +21,7 @@
         org.clojure/data.zip             {:mvn/version "1.0.0"}
         hato/hato                        {:mvn/version "0.9.0"}
         version-clj/version-clj          {:mvn/version "2.0.2"}
-        org.owasp/dependency-check-maven {:mvn/version "7.3.2"}
+        org.owasp/dependency-check-maven {:mvn/version "7.4.1"}
         aysylu/loom                      {:mvn/version "1.0.2"}
         ch.qos.logback/logback-classic   {:mvn/version "1.4.5"}
         org.slf4j/slf4j-api              {:mvn/version "2.0.5"}
@@ -38,7 +38,7 @@
                :main-opts ["-m" "antq.core"]}
     ; clj -M:kondo
     :kondo
-      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.11.02"}}
+      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.12.10"}}
        :main-opts  ["-m" "clj-kondo.main" "--lint" "src" "resources"]}
     ; clj -M:eastwood
     :eastwood
