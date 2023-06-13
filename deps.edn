@@ -21,9 +21,9 @@
         org.clojure/data.zip             {:mvn/version "1.0.0"}
         hato/hato                        {:mvn/version "0.9.0"}
         version-clj/version-clj          {:mvn/version "2.0.2"}
-        org.owasp/dependency-check-maven {:mvn/version "8.2.1"}
+        org.owasp/dependency-check-maven {:mvn/version "8.3.1"}
         aysylu/loom                      {:mvn/version "1.0.2"}
-        ch.qos.logback/logback-classic   {:mvn/version "1.4.7"}
+        ch.qos.logback/logback-classic   {:mvn/version "1.4.8"}
         org.slf4j/slf4j-api              {:mvn/version "2.0.7"}
         org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.7"}
         org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.7"}
