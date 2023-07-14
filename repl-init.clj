@@ -72,7 +72,7 @@
 
 ; Get all license names & URLs
 ;(def license-names (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) parsed-poms)))
-;(def license-urls  (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url zip-xml/text) parsed-poms)))
+;(def license-urls  (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url  zip-xml/text) parsed-poms)))
 
 ; How many POMs have a license name
 ;(count license-names)
@@ -81,14 +81,14 @@
 ;(sort-by second (frequencies license-names))
 
 ; 10 most common license names
-;(pprint (reverse (take-last 10 (sort-by second (frequencies license-names)))))
+;(pprint (take 10 (reverse (sort-by second (frequencies license-names)))))
 
 ; Distinct names
 ;(sort (distinct license-names))
 
 ; Save distinct names and URLs to file
 ;(spit (io/file "license-names.txt") (s/join "\n" (sort (distinct license-names))))
-;(spit (io/file "license-urls.txt") (s/join "\n" (sort (distinct license-urls))))
+;(spit (io/file "license-urls.txt")  (s/join "\n" (sort (distinct license-urls))))
 
 
 
