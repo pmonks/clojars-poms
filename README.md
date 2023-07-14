@@ -5,7 +5,7 @@
 
 # clojars-dependencies
 
-A little tool for exploring the dependencies between projects deployed to Clojars.
+A little tool that started out as a way to explore the dependencies between projects deployed to Clojars, but is now a more generally useful tool for analysing the POMs of projects deployed to Clojars.
 
 ## Installation
 
@@ -19,7 +19,7 @@ $ clojure -i repl-init.clj -r
 
 Note: the `repl-init.clj` script uses the [spinner](https://github.com/pmonks/spinner) library, which isn't compatible with the `clj` command line script.
 
-The first time this script is run it will pull down all POMs from clojars.org, which can take an hour or more depending on your network connection.  As of mid 2022, this is ~250,000 POM files (and the same amount of metadata files for caching purposes) totalling ~2.2GB.
+The first time this script is run (and assuming the `prevent-sync` flag is set to `false`) it will pull down all POMs from clojars.org and cache them locally, which can take an hour or more depending on your network connection.  As of mid 2023, this is ~265,000 POM files (and the same number of metadata files for caching purposes) totalling ~2.4GB.  On subsequent runs it will be a lot faster (especially if `prevent-sync` is set to `true`!), as it uses etag requests to Clojars to only pull what's new or modified.
 
 Look at [`repl-init.clj`](https://github.com/pmonks/clojars-dependencies/blob/master/repl-init.clj) for more details on what the script sets up and how you can experiment with this data.
 
