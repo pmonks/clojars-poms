@@ -47,9 +47,10 @@
 (def clojars-poms-directory "./poms/clojars")
 
 ; REPL state setup...
-(if prevent-sync
+(if (and prevent-sync (.exists (io/file clojars-poms-directory)))
   (println "ℹ️ Skipping Clojars POM sync")
   (do
+    (when prevent-sync (println "ℹ️ Files not synced; ignoring prevent-sync flag..."))
     (io/make-parents clojars-poms-directory)
     (print "ℹ️ Syncing POM index from Clojars... ")
     (pi/animate! (cs/sync-index! clojars-poms-directory))
