@@ -25,22 +25,23 @@
 ; Note: do NOT use `clj` to run this script, or you will see strange output behaviour
 ;
 
-(require '[clojure.pprint             :as pp :refer [pprint]])
-(require '[clojure.string             :as s])
-(require '[clojure.java.io            :as io])
-(require '[clojure.xml                :as xml])
-(require '[clojure.zip                :as zip])
-(require '[clojure.data.zip.xml       :as zip-xml])
-(require '[version-clj.core           :as ver])
-(require '[loom.graph                 :as g])
-(require '[loom.alg                   :as galg])
-(require '[loom.io                    :as gio])
-(require '[clojars-dependencies.sync  :as cs] :reload-all)
-(require '[clojars-dependencies.parse :as cp] :reload-all)
-(require '[progress.indeterminate     :as pi])
-(require '[progress.determinate       :as pd])
+(require '[clojure.pprint         :as pp :refer [pprint]])
+(require '[clojure.string         :as s])
+(require '[clojure.java.io        :as io])
+(require '[clojure.xml            :as xml])
+(require '[clojure.zip            :as zip])
+(require '[clojure.data.zip.xml   :as zip-xml])
+(require '[version-clj.core       :as ver])
+(require '[loom.graph             :as g])
+(require '[loom.alg               :as galg])
+(require '[loom.io                :as gio])
+(require '[clojars-poms.sync      :as cs] :reload-all)
+(require '[clojars-poms.parse     :as cp] :reload-all)
+(require '[progress.indeterminate :as pi])
+(require '[progress.determinate   :as pd])
 
 (def prevent-sync true)
+(def parse-latest-versions-only true)
 
 (def poms-directory "./poms")
 (def clojars-poms-directory "./poms/clojars")
@@ -61,10 +62,10 @@
       (println "ℹ️ Done - POMs synced")))
 
 (let [pom-count (cp/pom-count poms-directory)]
-  (println "ℹ️ Parsing" pom-count "POMs (latest version of each artifact only)... ")
+  (println (str "ℹ️ Parsing" pom-count "POMs " (if parse-latest-versions-only "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}
-                                (doall (cp/parse-pom-files poms-directory))))
+                                (doall (cp/parse-pom-files poms-directory parse-latest-versions-only ))))
   (println "ℹ️ Done - POMS parsed"))
 
 (println "\n\nParsed poms (as XML zippers) are in `parsed-poms` var\n")

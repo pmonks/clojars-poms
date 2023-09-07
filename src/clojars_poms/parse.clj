@@ -15,7 +15,7 @@
 ;
 ; SPDX-License-Identifier: Apache-2.0
 
-(ns clojars-dependencies.parse
+(ns clojars-poms.parse
   (:require [clojure.string        :as s]
             [clojure.java.io       :as io]
             [clojure.xml           :as xml]

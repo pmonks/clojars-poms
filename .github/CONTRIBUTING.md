@@ -16,12 +16,12 @@ By submitting a contribution to the project you agree to the above statements.
 
 ## Prerequisites
 
-* [ ] Have you [searched for duplicates](https://github.com/pmonks/clojars-dependencies/issues?utf8=%E2%9C%93&q=)?  A simple search for exception error messages or a summary of the unexpected behaviour should suffice.
+* [ ] Have you [searched for duplicates](https://github.com/pmonks/clojars-poms/issues?utf8=%E2%9C%93&q=)?  A simple search for exception error messages or a summary of the unexpected behaviour should suffice.
 * [ ] Are you running the latest version?
 * [ ] Are you sure this is a bug or missing capability?
 
 ## Raising an Issue
-* Create your issue [here](https://github.com/pmonks/clojars-dependencies/issues/new).
+* Create your issue [here](https://github.com/pmonks/clojars-poms/issues/new).
 * New issues contain three templates: bug report, feature request, and support question. Please pick the most appropriate for your issue.
 * Please use [Markdown formatting](https://help.github.com/categories/writing-on-github/) liberally to assist in readability.
   * [Code fences](https://help.github.com/articles/creating-and-highlighting-code-blocks/) for exception stack traces and log entries, for example, massively improve readability.

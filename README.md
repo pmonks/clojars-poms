@@ -1,9 +1,9 @@
-[![Open Issues](https://img.shields.io/github/issues/pmonks/clojars-dependencies.svg)](https://github.com/pmonks/clojars-dependencies/issues)
-![GitHub last commit](https://img.shields.io/github/last-commit/pmonks/clojars-dependencies.svg)
-[![License](https://img.shields.io/github/license/pmonks/clojars-dependencies.svg)](https://github.com/pmonks/clojars-dependencies/blob/master/LICENSE)
-<!-- [![Dependencies Status](https://versions.deps.co/pmonks/clojars-dependencies/status.svg)](https://versions.deps.co/pmonks/clojars-dependencies) -->
+[![Open Issues](https://img.shields.io/github/issues/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/issues)
+![GitHub last commit](https://img.shields.io/github/last-commit/pmonks/clojars-poms.svg)
+[![License](https://img.shields.io/github/license/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/blob/master/LICENSE)
+<!-- [![Dependencies Status](https://versions.deps.co/pmonks/clojars-poms/status.svg)](https://versions.deps.co/pmonks/clojars-poms) -->
 
-# clojars-dependencies
+# clojars-poms
 
 A little tool that started out as a way to explore the dependencies between projects deployed to Clojars, but is now a more generally useful tool for analysing the POMs of projects deployed to Clojars.
 
@@ -21,13 +21,13 @@ Note: the `repl-init.clj` script uses the [spinner](https://github.com/pmonks/sp
 
 The first time this script is run (and assuming the `prevent-sync` flag is set to `false`) it will pull down all POMs from clojars.org and cache them locally, which can take an hour or more depending on your network connection.  As of mid 2023, this is ~265,000 POM files (and the same number of metadata files for caching purposes) totalling ~2.4GB.  On subsequent runs it will be a lot faster (especially if `prevent-sync` is set to `true`!), as it uses etag requests to Clojars to only pull what's new or modified.
 
-Look at [`repl-init.clj`](https://github.com/pmonks/clojars-dependencies/blob/master/repl-init.clj) for more details on what the script sets up and how you can experiment with this data.
+Look at [`repl-init.clj`](https://github.com/pmonks/clojars-poms/blob/master/repl-init.clj) for more details on what the script sets up and how you can experiment with this data.
 
 ## Developer Information
 
-[GitHub project](https://github.com/pmonks/clojars-dependencies)
+[GitHub project](https://github.com/pmonks/clojars-poms)
 
-[Bug Tracker](https://github.com/pmonks/clojars-dependencies/issues)
+[Bug Tracker](https://github.com/pmonks/clojars-poms/issues)
 
 ## License
 

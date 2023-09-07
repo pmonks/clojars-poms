@@ -15,7 +15,7 @@
 ;
 ; SPDX-License-Identifier: Apache-2.0
 
-(ns clojars-dependencies.sync
+(ns clojars-poms.sync
   (:require [clojure.string  :as s]
             [clojure.java.io :as io]
             [clojure.edn     :as edn]
@@ -93,7 +93,7 @@
         response      (hc/get clojars-url
                               {:http-client       http-client
                                :throw-exceptions? false
-                               :headers           (merge {"User-Agent" "com.github.pmonks/clojars-dependencies"}
+                               :headers           (merge {"User-Agent" "com.github.pmonks/clojars-poms"}
                                                          (when etag {"If-None-Match" etag}))})]
     (case (:status response)
       200   (do (write-file-and-meta! target file-path response) true)
