@@ -67,7 +67,7 @@
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}
                                 (doall (cp/parse-pom-files poms-directory parse-latest-versions-only ))))
-  (println "ℹ️ Done - POMS parsed"))
+  (println "ℹ️ Done - POMs parsed"))
 
 (println "\n\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
 
