@@ -93,6 +93,19 @@
 
 
 
+; Count how many have a license
+;(count (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license zip-xml/text) parsed-poms)))
+
+; poms without licenses
+;(def poms-without-licenses (doall (filter #(s/blank? (zip-xml/xml1-> % :licenses :license zip-xml/text)) parsed-poms)))
+
+; dump poms without licenses to a file
+;(spit "poms-without-licenses.txt" (s/join "\n" (sort (map #(cp/gav->string (cp/gav %)) poms-without-licenses))))
+
+
+
+
+
 ;(def latest-versions-only (cp/latest-project-versions parsed-poms))
 ;(println "ℹ️ Found" (count latest-versions-only) "unique projects")
 

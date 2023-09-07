@@ -94,68 +94,15 @@
   (let [group-id    (zip-xml/xml1-> elem      :groupId    zip-xml/text)
         artifact-id (zip-xml/xml1-> elem      :artifactId zip-xml/text)
         version     (str (zip-xml/xml1-> elem :version    zip-xml/text))]
-    (if-not (s/blank? artifact-id)
-      (merge {:artifact-id artifact-id}
-             (when-not (s/blank? group-id) {:group-id group-id})
-             (when-not (s/blank? version)  {:version  version}))
-      (throw (ex-info "Found a GAV without an artifactId!" {:element elem})))))
+    (merge {:artifact-id artifact-id}
+           (when-not (s/blank? group-id) {:group-id group-id})
+           (when-not (s/blank? version)  {:version  version}))))
 
+(defn gav->string
+  "Turns a gav (returned be `gav`) into a string. Can also be used with sort-by."
+  [gav]
+  (str (:group-id gav)
+       (when (and (:group-id gav) (:artifact-id gav)) "/")
+       (:artifact-id gav)
+       (when (:version gav) (str "@" (:version gav)))))
 
-
-
-
-
-
-
-
-
-
-(comment "Old code narrowly focused on Leiningen style dependencies"
-(defn lein-gav
-  "Parses a POM XML element containing a Maven GAV, and returns it in Leiningen format: [\"[groupId/]artifactId\" \"versionStr\"]."
-  [root]
-  (let [{:keys [group-id artifact-id version]} (gav root)]
-    (when-not (s/blank? artifact-id)
-      (when-not (s/blank? group-id)
-        [(str group-id "/" artifact-id) version]
-        [artifact-id version]))))
-
-(defn pom-file->dependencies
-  "Parses a single POM file (a java.io.File) into a tuple of: [projectLeinGAV #{dependencyLeinGAVs, ...}] (see lein-gav for the format of each LeinGAV)."
-  [^java.io.File pom-file]
-  (try
-    ; We do all of this because some of the POMs in Clojars are invalid in ways that are trivial to fix (leading whitespace, BOM, invalid UTF-8 byte sequences)
-    (let [root            (pom-file->xml-zipper pom-file)
-          project-gav     (lein-gav root)
-          dependency-gavs (some-> (seq (remove nil? (map lein-gav (zip-xml/xml-> root :dependencies :dependency))))
-                                  set)]
-      (when project-gav
-        [project-gav dependency-gavs]))
-    (catch Exception e
-      (print (str "⚠️ Unable to parse POM " (.getName pom-file) ": " e "\n"))
-      (flush))))
-
-(defn parse-pom-files-in-dir
-  "Returns a lazy sequence of parsed POMs in the given directory and subdirectories (see parse-pom-file for the format of each entry in the sequence)."
-  [poms-directory]
-  (let [pom-files (filter #(and (.endsWith (.getName ^java.io.File %) ".pom")
-                                (.canRead ^java.io.File %)
-                                (not (.isDirectory ^java.io.File %)))
-                          (file-seq (io/file poms-directory)))]
-    (remove nil? (pmap pom-file->dependencies pom-files))))
-
-(defn latest-project-versions
-  "Filters out all but the latest version of each project (based on how version-clj compares Maven version strings)."
-  [parsed-pom-files]
-  (let [grouped-projects (group-by #(first (first %)) parsed-pom-files)]
-    (pmap #(last (sort-by (fn [p] (second (first p))) ver/version-compare (second %))) grouped-projects)))
-
-(defn dependencies
-  "Returns a sequence of dependency pairs, in [fromLeinGAV toLeinGAV] format."
-  [latest-project-versions]
-  (let [version-numbers-elided (pmap #(vec [(first (first %)) (map first (second %))]) latest-project-versions)]
-    (for [project version-numbers-elided
-          from    [(first project)]
-          to      (second project)]
-      [from to])))
-)
