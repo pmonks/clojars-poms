@@ -94,9 +94,10 @@
   (let [group-id    (zip-xml/xml1-> elem      :groupId    zip-xml/text)
         artifact-id (zip-xml/xml1-> elem      :artifactId zip-xml/text)
         version     (str (zip-xml/xml1-> elem :version    zip-xml/text))]
-    (merge {:artifact-id artifact-id}
-           (when-not (s/blank? group-id) {:group-id group-id})
-           (when-not (s/blank? version)  {:version  version}))))
+    (merge {}
+           (when-not (s/blank? artifact-id) {:artifact-id artifact-id})
+           (when-not (s/blank? group-id)    {:group-id group-id})
+           (when-not (s/blank? version)     {:version  version}))))
 
 (defn gav->string
   "Turns a gav (returned be `gav`) into a string. Can also be used with sort-by."
