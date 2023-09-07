@@ -21,7 +21,7 @@ Note: the `repl-init.clj` script uses the [spinner](https://github.com/pmonks/sp
 
 **The first time this script is run it will pull down all POMs from clojars.org and cache them locally, which can take an hour or more depending on your network connection.**  As of mid 2023, this is ~265,000 POM files (and the same number of metadata files for caching purposes) totalling ~2.4GB.  On subsequent runs it will be a lot faster (especially if `prevent-sync` is set to `true`!), as it uses etag requests to Clojars to only pull what's new or modified.
 
-**Please limit how often you re-sync poms from Clojars!**  They provide a wonderful service to the Clojure community for free, but someone is paying for their bandwidth and those folks deserve some respect!
+**Please limit how often you re-sync poms from Clojars!**  They provide a wonderful service to the Clojure community for free, but someone is paying for their bandwidth and those folks deserve our respect!
 
 Look at [`repl-init.clj`](https://github.com/pmonks/clojars-poms/blob/master/repl-init.clj) for more details on what the script sets up and how you can experiment with this data.
 
