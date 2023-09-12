@@ -41,32 +41,35 @@
 (require '[progress.determinate   :as pd])
 
 (def prevent-sync true)
-(def parse-latest-versions-only true)
+(def parse-latest-versions-only? true)
 
 (def poms-directory "./poms")
 (def clojars-poms-directory "./poms/clojars")
+(def cache-exists? (.exists (io/file clojars-poms-directory)))
 
 ; REPL state setup...
-(if (and prevent-sync (.exists (io/file clojars-poms-directory)))
+(if (and prevent-sync cache-exists?)
   (println "ℹ️ Skipping Clojars POM sync")
   (do
-    (when prevent-sync (println "ℹ️ Files not synced; ignoring prevent-sync flag..."))
+    (when prevent-sync (println "ℹ️ Cache doesn't exist; ignoring prevent-sync flag..."))
     (io/make-parents clojars-poms-directory)
-    (print "ℹ️ Syncing POM index from Clojars... ")
+    (print "ℹ️ Syncing Clojars POM index ... ")
+    (flush)
     (pi/animate! (cs/sync-index! clojars-poms-directory))
     (let [pom-count (cs/pom-count clojars-poms-directory)]
-      (println "\nℹ️ Syncing" pom-count "POMs from Clojars... ")
-      (cs/sync-index! clojars-poms-directory)
+      (println "\nℹ️ " (if cache-exists? "Checking" "Syncing") " " pom-count " Clojars POMs... ")
+      (flush)
       (pd/animate! cs/sync-count
                    :opts {:total pom-count}
-                   (cs/sync-clojars-poms! clojars-poms-directory)))   ; This may take a long time...
-      (println "ℹ️ Done - POMs synced")))
+                   (cs/sync-clojars-poms! clojars-poms-directory)))   ; This takes a loooooong time...
+      (println "ℹ️ Done - POMs " (if cache-exists? "checked" "synced"))))
 
 (let [pom-count (cp/pom-count poms-directory)]
-  (println (str "ℹ️ Parsing" pom-count "POMs " (if parse-latest-versions-only "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
+  (println (str "ℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
+  (flush)
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}
-                                (doall (cp/parse-pom-files poms-directory parse-latest-versions-only ))))
+                                (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
   (println "ℹ️ Done - POMs parsed"))
 
 (println "\n\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
