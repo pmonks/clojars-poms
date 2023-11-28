@@ -21,9 +21,9 @@
         org.clojure/data.zip             {:mvn/version "1.0.0"}
         hato/hato                        {:mvn/version "0.9.0"}
         version-clj/version-clj          {:mvn/version "2.0.2"}
-        org.owasp/dependency-check-maven {:mvn/version "8.4.2"}
+        org.owasp/dependency-check-maven {:mvn/version "9.0.1"}
         aysylu/loom                      {:mvn/version "1.0.2"}
-        ch.qos.logback/logback-classic   {:mvn/version "1.4.11"}
+        ch.qos.logback/logback-classic   {:mvn/version "1.4.13"}
         org.slf4j/slf4j-api              {:mvn/version "2.0.9"}
         org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.9"}
         org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.9"}
@@ -42,6 +42,6 @@
        :main-opts  ["-m" "clj-kondo.main" "--lint" "src" "resources"]}
     ; clj -M:eastwood
     :eastwood
-      {:extra-deps {jonase/eastwood {:mvn/version "1.4.0"}}
+      {:extra-deps {jonase/eastwood {:mvn/version "1.4.2"}}
        :main-opts  ["-m" "eastwood.lint" {:source-paths ["src" "resources"]}]}
     }}
