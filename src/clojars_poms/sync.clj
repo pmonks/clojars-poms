@@ -19,7 +19,8 @@
   (:require [clojure.string  :as s]
             [clojure.java.io :as io]
             [clojure.edn     :as edn]
-            [hato.client     :as hc]))
+            [hato.client     :as hc]
+            [embroidery.api  :as e]))
 
 (def clojars-repo  "https://repo.clojars.org")
 (def all-poms-list "all-poms.txt")
@@ -121,7 +122,8 @@
   (reset! sync-count 0)
   (let [all-poms-file (str target "/" all-poms-list)
         all-pom-paths (map #(s/replace-first % "./" "") (with-open [r (io/reader all-poms-file)] (doall (line-seq r))))]
-    (doall (pmap #(do (try3sleep1 (download-file-from-clojars! target %))
-                      (swap! sync-count inc))
-                 all-pom-paths)))
+    (doall (e/bounded-pmap* 8192  ; Cap concurrency at 8192, to try to avoid running out of file handles (limit on maxOS is normally 10240)
+                            #(do (try3sleep1 (download-file-from-clojars! target %))
+                               (swap! sync-count inc))
+                            all-pom-paths)))
   nil)

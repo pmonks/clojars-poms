@@ -22,7 +22,8 @@
             [clojure.zip           :as zip]
             [clojure.data.zip.xml  :as zip-xml]
             [clojure.tools.logging :as log]
-            [version-clj.core      :as ver]))
+            [version-clj.core      :as ver]
+            [embroidery.api        :as e]))
 
 (defn list-pom-files
   "Returns a lazy sequence of all the POM files in dir."
@@ -36,6 +37,7 @@
   "Takes a sequence of POM files, assumed to be in a standard Maven layout (i.e. ..whatever../groupid/artifactId/version/artifact-version.pom), and returns a lazy sequence containing just the latest version's POM file for each groupId/artifactId."
   [pom-files]
   (let [grouped-poms (group-by #(s/join "/" (drop-last 2 (s/split (str %) #"/"))) pom-files)]
+    ; We use regular pmap here, because this workload is CPU bound so there's no benefit in using virtual threads
     (pmap #(last (sort-by (fn [f] (last (drop-last (s/split (str f) #"/"))))
                           ver/version-compare
                           (val %)))
@@ -79,10 +81,11 @@
     (let [pom-files (if latest-versions-only?
                       (latest-versions-only (list-pom-files dir))
                       (list-pom-files dir))]
-      (filter identity (pmap #(let [xml-zip (pom-file->xml-zipper %)]
-                                (swap! parse-count inc)
-                                xml-zip)
-                             pom-files)))))
+      (filter identity (e/bounded-pmap* 8192  ; Cap concurrency at 8192, to try to avoid running out of file handles (limit on maxOS is normally 10240)
+                                        #(let [xml-zip (pom-file->xml-zipper %)]
+                                           (swap! parse-count inc)
+                                           xml-zip)
+                                        pom-files)))))
 
 (defn gav
   "Parses a POM XML element containing a Maven GAV, and returns it as a map with keys:
@@ -106,4 +109,3 @@
        (when (and (:group-id gav) (:artifact-id gav)) "/")
        (:artifact-id gav)
        (when (:version gav) (str "@" (:version gav)))))
-
