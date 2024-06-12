@@ -53,19 +53,21 @@
   (do
     (when prevent-sync (println "ℹ️ Cache doesn't exist; ignoring prevent-sync flag..."))
     (io/make-parents clojars-poms-directory)
-    (print "ℹ️ Syncing Clojars POM index ... ")
+    (print "ℹ️ Syncing Clojars POM index... ")
     (flush)
     (pi/animate! (cs/sync-index! clojars-poms-directory))
     (let [pom-count (cs/pom-count clojars-poms-directory)]
-      (println "\nℹ️ " (if cache-exists? "Checking" "Syncing") " " pom-count " Clojars POMs... ")
+      (println "\nℹ️" (if cache-exists? "Checking" "Syncing") pom-count "Clojars POMs...")
       (flush)
       (pd/animate! cs/sync-count
                    :opts {:total pom-count}
                    (cs/sync-clojars-poms! clojars-poms-directory)))   ; This takes a loooooong time...
-      (println "ℹ️ Done - POMs " (if cache-exists? "checked" "synced"))))
+      (println "ℹ️ Done - POMs" (if cache-exists? "checked" "synced"))))
+
+(println "ℹ️ Counting cached POM files...")
 
 (let [pom-count (cp/pom-count poms-directory)]
-  (println (str "ℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
+  (println (str "ℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "..."))
   (flush)
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}

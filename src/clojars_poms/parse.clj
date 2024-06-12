@@ -67,7 +67,7 @@
     (try
       (zip/xml-zip (xml/parse xml-is))
       (catch Exception e
-        (log/warn e (str "Unexpected exception while parsing " pom-file))
+        (log/warn (str "Unexpected exception while parsing " pom-file (.getMessage e)))
         nil))))
 
 ; A monitorable counter of how many POMs have been parsed
@@ -81,11 +81,12 @@
     (let [pom-files (if latest-versions-only?
                       (latest-versions-only (list-pom-files dir))
                       (list-pom-files dir))]
-      (filter identity (e/bounded-pmap* 8192  ; Cap concurrency at 8192, to try to avoid running out of file handles (limit on maxOS is normally 10240)
-                                        #(let [xml-zip (pom-file->xml-zipper %)]
-                                           (swap! parse-count inc)
-                                           xml-zip)
-                                        pom-files)))))
+      (filter identity (doall
+                         (e/bounded-pmap* 8192  ; Cap concurrency at 8192, to try to avoid running out of file handles (limit on maxOS is normally 10240)
+                                          #(let [xml-zip (pom-file->xml-zipper %)]
+                                             (swap! parse-count inc)
+                                             xml-zip)
+                                          pom-files))))))
 
 (defn gav
   "Parses a POM XML element containing a Maven GAV, and returns it as a map with keys:
