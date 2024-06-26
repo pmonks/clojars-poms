@@ -40,7 +40,7 @@
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
 
-(def prevent-sync true)
+(def prevent-sync false)
 (def parse-latest-versions-only? true)
 
 (def poms-directory "./poms")
@@ -56,23 +56,25 @@
     (print "ℹ️ Syncing Clojars POM index... ")
     (flush)
     (pi/animate! (cs/sync-index! clojars-poms-directory))
-    (let [pom-count (cs/pom-count clojars-poms-directory)]
+    (let [pom-count (cs/pom-count clojars-poms-directory)
+          start     (System/currentTimeMillis)]
       (println "\nℹ️" (if cache-exists? "Checking" "Syncing") pom-count "Clojars POMs...")
       (flush)
       (pd/animate! cs/sync-count
                    :opts {:total pom-count}
-                   (cs/sync-clojars-poms! clojars-poms-directory)))   ; This takes a loooooong time...
-      (println "ℹ️ Done - POMs" (if cache-exists? "checked" "synced"))))
+                   (cs/sync-clojars-poms! clojars-poms-directory))   ; This takes a loooooong time...
+      (println "ℹ️ Done -" pom-count "POMs" (if cache-exists? "checked" "synced") "in" (str (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)) "s")))))
 
 (println "ℹ️ Counting cached POM files...")
 
-(let [pom-count (cp/pom-count poms-directory)]
+(let [pom-count (pi/animate! (cp/pom-count poms-directory))
+      start     (System/currentTimeMillis)]
   (println (str "ℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "..."))
   (flush)
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}
                                 (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
-  (println "ℹ️ Done - POMs parsed"))
+  (println "ℹ️ Done -" pom-count "POMs parsed in" (str (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)) "s")))
 
 (println "\n\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
 
@@ -83,6 +85,9 @@
 
 ; How many POMs have a license name
 ;(count license-names)
+
+; How many unique license names
+;(count (distinct license-names))
 
 ; Frequencies
 ;(sort-by second (frequencies license-names))
