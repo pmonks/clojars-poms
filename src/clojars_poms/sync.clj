@@ -30,6 +30,8 @@
 (defonce http-client (hc/build-http-client {:connect-timeout 10000
                                             :redirect-policy :always}))
 
+(def max-http-concurrency 100)   ; Maximum concurrency to use for HTTP requests
+
 (defn- encode-url-path
   "Encodes a URL path (but NOT a query string)."
   [url-path]
@@ -122,7 +124,7 @@
   (reset! sync-count 0)
   (let [all-poms-file (str target "/" all-poms-list)
         all-pom-paths (map #(s/replace-first % "./" "") (with-open [r (io/reader all-poms-file)] (doall (line-seq r))))]
-    (doall (e/bounded-pmap* 8192  ; Cap concurrency at 8192, to try to avoid running out of file handles (limit on maxOS is normally 10240)
+    (doall (e/bounded-pmap* max-http-concurrency
                             #(do (try3sleep1 (download-file-from-clojars! target %))
                                (swap! sync-count inc))
                             all-pom-paths)))
