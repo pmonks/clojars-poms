@@ -40,7 +40,7 @@
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
 
-(def prevent-sync false)
+(def prevent-sync true)
 (def parse-latest-versions-only? true)
 
 (def poms-directory "./poms")
@@ -65,18 +65,18 @@
                    (cs/sync-clojars-poms! clojars-poms-directory))   ; This takes a loooooong time...
       (println "ℹ️ Done -" pom-count "POMs" (if cache-exists? "checked" "synced") "in" (str (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)) "s")))))
 
-(println "ℹ️ Counting cached POM files...")
+(print "ℹ️ Counting cached POM files... ")
 
 (let [pom-count (pi/animate! (cp/pom-count poms-directory))
       start     (System/currentTimeMillis)]
-  (println (str "ℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "..."))
+  (println (str "\nℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
   (flush)
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}
                                 (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
   (println "ℹ️ Done -" pom-count "POMs parsed in" (str (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)) "s")))
 
-(println "\n\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
+(println "\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
 
 
 ; Get all license names & URLs

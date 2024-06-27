@@ -30,7 +30,7 @@
 (defonce http-client (hc/build-http-client {:connect-timeout 10000
                                             :redirect-policy :always}))
 
-(def max-http-concurrency 100)   ; Maximum concurrency to use for HTTP requests
+(def max-http-concurrency 500)   ; Maximum concurrency to use for HTTP requests - Clojars rejects too many concurrent requests
 
 (defn- encode-url-path
   "Encodes a URL path (but NOT a query string)."
