@@ -78,10 +78,34 @@
 
 (println "\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
 
+; Handy utility fns
+(defn pom->gav
+  "Returns the GAV (as a String) of the given POM xml."
+  [pom-xml]
+  (when pom-xml
+    (str (zip-xml/xml1-> pom-xml :groupId zip-xml/text)
+         "/"
+         (zip-xml/xml1-> pom-xml :artifactId zip-xml/text)
+         "@"
+         (zip-xml/xml1-> pom-xml :version zip-xml/text))))
+
+(defn find-deps-by-license-name
+  "Find all deps with the given license name"
+  [lic]
+  (when-not (s/blank? lic)
+    (some-> (map pom->gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) parsed-poms))
+            seq
+            set)))
 
 ; Get all license names & URLs
 ;(def license-names (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) parsed-poms)))
 ;(def license-urls  (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url  zip-xml/text) parsed-poms)))
+
+; Distinct license names (as a set)
+;(def distinct-license-names (some-> (distinct license-names) seq set))
+
+; Find dependencies with a specific license name
+;(find-deps-by-license-name "MIT/Apache-2.0/BSD-3-Clause")
 
 ; How many POMs have a license name
 ;(count license-names)
