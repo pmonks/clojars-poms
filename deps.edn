@@ -22,25 +22,25 @@
         org.clojure/data.zip             {:mvn/version "1.1.0"}
         hato/hato                        {:mvn/version "1.0.0"}
         version-clj/version-clj          {:mvn/version "2.0.3"}
-        org.owasp/dependency-check-maven {:mvn/version "10.0.4"}
+        org.owasp/dependency-check-maven {:mvn/version "11.1.1"}
         aysylu/loom                      {:mvn/version "1.0.2"}
-        ch.qos.logback/logback-classic   {:mvn/version "1.5.7"}
+        ch.qos.logback/logback-classic   {:mvn/version "1.5.15"}
         org.slf4j/slf4j-api              {:mvn/version "2.0.16"}
         org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.16"}
         org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.16"}
         org.slf4j/jul-to-slf4j           {:mvn/version "2.0.16"}
-        com.github.pmonks/spinner        {:mvn/version "2.0.233"}
+        com.github.pmonks/spinner        {:mvn/version "2.0.238"}
         com.github.pmonks/embroidery     {:mvn/version "1.0.44"}}
  :aliases {
     ; clj -M:check
     :check    {:extra-deps {com.github.athos/clj-check {:git/sha "d997df866b2a04b7ce7b17533093ee0a2e2cb729"}}
                :main-opts  ["-m" "clj-check.check"]}
     ; clj -M:outdated
-    :outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "2.9.1221"}}
+    :outdated {:extra-deps {com.github.liquidz/antq {:mvn/version "2.11.1260"}}
                :main-opts ["-m" "antq.core"]}
     ; clj -M:kondo
     :kondo
-      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2024.08.29"}}
+      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
        :main-opts  ["-m" "clj-kondo.main" "--lint" "src" "resources"]}
     ; clj -M:eastwood
     :eastwood
