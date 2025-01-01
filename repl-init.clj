@@ -93,11 +93,30 @@
          "@"
          (zip-xml/xml1-> pom-xml :version zip-xml/text))))
 
+(defn gav->clojars-url
+  "Returns the Clojars URL of the *directory* containing the POM for the given
+  GAV."
+  [gav]
+  (when-not (s/blank? gav)
+    (let [[ga v] (s/split gav #"@")
+          [g  a] (s/split ga  #"/")]
+      (str "https://repo.clojars.org/"
+           (s/replace g "." "/")
+           "/" a "/" v "/"))))
+
 (defn find-deps-by-license-name
   "Find all deps with the given license name"
   [lic]
   (when-not (s/blank? lic)
     (some-> (map pom->gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) parsed-poms))
+            seq
+            set)))
+
+(defn find-deps-containing-fragment-in-name
+  "Find all deps with the given fragment in the license name"
+  [fragment]
+  (when-not (s/blank? fragment)
+    (some-> (map pom->gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) parsed-poms))
             seq
             set)))
 
