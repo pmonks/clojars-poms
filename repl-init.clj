@@ -82,6 +82,13 @@
 
 (println "\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
 
+(println "Handy functions include:")
+(println "  * pom->gav")
+(println "  * gav->clojars-url")
+(println "  * find-deps-by-license-name")
+(println "  * find-deps-containing-fragment-in-name")
+(println)
+
 ; Handy utility fns
 (defn pom->gav
   "Returns the GAV (as a String) of the given POM xml."
