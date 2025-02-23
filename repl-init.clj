@@ -40,10 +40,6 @@
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
 
-; Skips syncing of Clojars entirely, if the local cache of the Clojars poms has previously been populated
-; Note: this almost guarantees that the local data is stale
-(def skip-sync? true)
-
 ; Controls whether only the POM of the latest version of each artifact is parsed
 (def parse-latest-versions-only? true)
 
@@ -52,10 +48,16 @@
 (def cache-exists? (.exists (io/file clojars-poms-directory)))
 
 ; REPL state setup...
-(if (and skip-sync? cache-exists?)
+(def sync? (when cache-exists?
+             (print "\nCache exists; sync? [y/N] ")
+             (flush)
+             (s/starts-with? (s/lower-case (read-line)) "y")))
+
+(if (and cache-exists?
+         (not sync?))
   (println "ℹ️ Skipping Clojars POM sync")
   (do
-    (when skip-sync? (println "ℹ️ Cache doesn't exist; ignoring skip-sync? flag..."))
+    (when-not cache-exists? (println "ℹ️ Cache doesn't exist; will sync all Clojars POMs"))
     (io/make-parents clojars-poms-directory)
     (print "ℹ️ Syncing Clojars POM index... ")
     (flush)

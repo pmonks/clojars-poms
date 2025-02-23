@@ -34,7 +34,10 @@
           (file-seq (io/file dir))))
 
 (defn latest-versions-only
-  "Takes a sequence of POM files, assumed to be in a standard Maven layout (i.e. ..whatever../groupid/artifactId/version/artifact-version.pom), and returns a lazy sequence containing just the latest version's POM file for each groupId/artifactId."
+  "Takes a sequence of POM files, assumed to be in a standard Maven layout (i.e.
+  ..whatever../groupid/artifactId/version/artifact-version.pom), and returns a
+  lazy sequence containing just the latest version's POM file for each
+  groupId/artifactId."
   [pom-files]
   (let [grouped-poms (group-by #(s/join "/" (drop-last 2 (s/split (str %) #"/"))) pom-files)]
     ; We use regular pmap here, because this workload is CPU bound so there's no benefit in using virtual threads
@@ -53,7 +56,9 @@
                all-pom-files)))))
 
 (defn pom-file->xml-zipper
-  "Parses a single POM file (a java.io.File) into an XML zipper structure (as per clojure.zip/xml-zip).  Assumes UTF-8 data and attempts to silently ignore malformed input and unmappable characters."
+  "Parses a single POM file (a java.io.File) into an XML zipper structure (as
+  per clojure.zip/xml-zip).  Assumes UTF-8 data and attempts to silently ignore
+  malformed input and unmappable characters."
   [^java.io.File pom-file]
   (let ; This stuff doesn't seem to work any more...
        ;[xml-decoder     (doto (.newDecoder            java.nio.charset.StandardCharsets/UTF_8)
@@ -74,7 +79,9 @@
 (def parse-count (atom 0))
 
 (defn parse-pom-files
-  "Returns a lazy sequence of XML zippers for all of the POM files in the given directory and its subdirectories, defaulting to just the latest version of each groupId/artifactId."
+  "Returns a lazy sequence of XML zippers for all of the POM files in the given
+  directory and its subdirectories, defaulting to just the latest version of
+  each groupId/artifactId."
   ([dir] (parse-pom-files dir true))
   ([dir latest-versions-only?]
     (reset! parse-count 0)
@@ -89,7 +96,8 @@
                                           pom-files))))))
 
 (defn gav
-  "Parses a POM XML element containing a Maven GAV, and returns it as a map with keys:
+  "Parses a POM XML element containing a Maven GAV, and returns it as a map with
+  keys:
 
   * :group-id
   * :artifact-id

@@ -72,7 +72,8 @@
   nil)
 
 (defn- try-n-times
-  "Try f up to n times, with optional sleep in between - adapted from https://ericnormand.me/article/try-three-times"
+  "Try f up to n times, with optional sleep in between - adapted from
+  https://ericnormand.me/article/try-three-times"
   ([f n] (try-n-times f n 0))
   ([f n sleep-ms]
     (if (zero? (dec n))
@@ -88,7 +89,9 @@
   `(try-n-times (fn [] ~@body) 3 1000))
 
 (defn- download-file-from-clojars!
-  "Downloads a single file (identified by file-path) from Clojars, to the specific target directory. Does nothing if the given file hasn't changed (as per ETag / If-None-Match). Returns true if the file was downloaded."
+  "Downloads a single file (identified by file-path) from Clojars, to the
+  specific target directory. Does nothing if the given file hasn't changed (as
+  per ETag / If-None-Match). Returns true if the file was downloaded."
   [target file-path]
   (let [metadata-file (io/file (str target "/" file-path metadata-ext))
         etag          (when (.exists metadata-file) (with-open [r (io/reader metadata-file)] (:etag (edn/read (java.io.PushbackReader. r)))))
@@ -96,7 +99,7 @@
         response      (hc/get clojars-url
                               {:http-client       http-client
                                :throw-exceptions? false
-                               :headers           (merge {"User-Agent" "com.github.pmonks/clojars-poms"}
+                               :headers           (merge {"User-Agent" "https://github.com/pmonks/clojars-poms"}
                                                          (when etag {"If-None-Match" etag}))})]
     (case (:status response)
       200   (do (write-file-and-meta! target file-path response) true)
@@ -110,7 +113,8 @@
   (try3sleep1 (download-file-from-clojars! target all-poms-list)))
 
 (defn pom-count
-  "Returns the number of POM files in the index. Throws if the index hasn't been downloaded yet."
+  "Returns the number of POM files in the index. Throws if the index hasn't been
+  downloaded yet."
   [target]
   (count (line-seq (io/reader (str target "/" all-poms-list)))))
 
@@ -119,7 +123,8 @@
 
 ; Note: doesn't support deletion (though Clojars itself may not allow deletion anyway? 🤔)
 (defn sync-clojars-poms!
-  "Syncs all POMs from Clojars to the target directory. Throws if the index hasn't been downloaded yet."
+  "Syncs all POMs from Clojars to the target directory. Throws if the index
+  hasn't been downloaded yet."
   [target]
   (reset! sync-count 0)
   (let [all-poms-file (str target "/" all-poms-list)
