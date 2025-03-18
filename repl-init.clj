@@ -69,7 +69,12 @@
       (pd/animate! cs/sync-count
                    :opts {:total pom-count}
                    (cs/sync-clojars-poms! clojars-poms-directory))   ; This takes a loooooong time...
-      (println "ℹ️ Done -" pom-count "POMs" (if cache-exists? "checked" "synced") "in" (str (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)) "s")))))
+      (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
+        (println (format "ℹ️ Done - %d POMs %s in %ds (%.2f/s)"
+                         pom-count
+                         (if cache-exists? "checked" "synced")
+                         time-taken
+                         (double (/ pom-count time-taken))))))))
 
 (print "ℹ️ Counting cached POM files... ")
 
@@ -80,7 +85,11 @@
   (def parsed-poms (pd/animate! cp/parse-count
                                 :opts {:total pom-count}
                                 (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
-  (println "ℹ️ Done -" pom-count "POMs parsed in" (str (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)) "s")))
+  (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
+    (println (format "ℹ️ Done - %d POMs parsed in %ds (%.2f/s)"
+                     pom-count
+                     time-taken
+                     (double (/ pom-count time-taken))))))
 
 (println "\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
 
