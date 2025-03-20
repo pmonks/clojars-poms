@@ -41,11 +41,12 @@
 (require '[progress.determinate   :as pd])
 
 ; Controls whether only the POM of the latest version of each artifact is parsed
+; Turning this off will substantially increase memory usage
 (def parse-latest-versions-only? true)
 
-(def poms-directory "./poms")
+(def poms-directory         "./poms")
 (def clojars-poms-directory (str poms-directory "/clojars"))
-(def cache-exists? (.exists (io/file clojars-poms-directory)))
+(def cache-exists?          (.exists (io/file clojars-poms-directory)))
 
 ; REPL state setup...
 (def sync? (when cache-exists?
@@ -82,22 +83,22 @@
       start     (System/currentTimeMillis)]
   (println (str "\nℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
   (flush)
-  (def parsed-poms (pd/animate! cp/parse-count
-                                :opts {:total pom-count}
-                                (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
+  (def poms (pd/animate! cp/parse-count
+                         :opts {:total pom-count}
+                         (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
   (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
     (println (format "ℹ️ Done - %d POMs parsed in %ds (%.2f/s)"
                      pom-count
                      time-taken
                      (double (/ pom-count time-taken))))))
 
-(println "\nParsed poms (as XML zippers) are in `parsed-poms` var\n")
+(println "\nParsed poms (as a sequence of XML zippers) are in var `poms`\n")
 
 (println "Handy functions include:")
-(println "  * pom->gav")
-(println "  * gav->clojars-url")
-(println "  * find-deps-by-license-name")
-(println "  * find-deps-containing-fragment-in-name")
+(println "  * (pom->gav pom-xml-zipper)")
+(println "  * (gav->clojars-url gav-string)")
+(println "  * (find-deps-by-license-name license-name-string)")
+(println "  * (find-deps-containing-fragment-in-name license-fragment-string)")
 (println)
 
 ; Handy utility fns
@@ -126,7 +127,7 @@
   "Find all deps with the given license name"
   [lic]
   (when-not (s/blank? lic)
-    (some-> (map pom->gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) parsed-poms))
+    (some-> (map pom->gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) poms))
             seq
             set)))
 
@@ -134,13 +135,13 @@
   "Find all deps with the given fragment in the license name"
   [fragment]
   (when-not (s/blank? fragment)
-    (some-> (map pom->gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) parsed-poms))
+    (some-> (map pom->gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) poms))
             seq
             set)))
 
 ; Get all license names & URLs
-;(def license-names (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) parsed-poms)))
-;(def license-urls  (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url  zip-xml/text) parsed-poms)))
+;(def license-names (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms)))
+;(def license-urls  (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url  zip-xml/text) poms)))
 
 ; Distinct license names (as a set)
 ;(def distinct-license-names (some-> (distinct license-names) seq set))
@@ -171,10 +172,10 @@
 
 
 ; Count how many have a license
-;(count (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license zip-xml/text) parsed-poms)))
+;(count (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license zip-xml/text) poms)))
 
 ; poms without licenses
-;(def poms-without-licenses (doall (filter #(s/blank? (zip-xml/xml1-> % :licenses :license zip-xml/text)) parsed-poms)))
+;(def poms-without-licenses (doall (filter #(s/blank? (zip-xml/xml1-> % :licenses :license zip-xml/text)) poms)))
 
 ; dump poms without licenses to a file
 ;(spit "poms-without-licenses.txt" (s/join "\n" (sort (map #(cp/gav->string (cp/gav %)) poms-without-licenses))))
@@ -183,7 +184,7 @@
 
 
 
-;(def latest-versions-only (cp/latest-project-versions parsed-poms))
+;(def latest-versions-only (cp/latest-project-versions poms))
 ;(println "ℹ️ Found" (count latest-versions-only) "unique projects")
 
 ;(def dependencies (cp/dependencies latest-versions-only))
