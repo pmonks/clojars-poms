@@ -48,14 +48,18 @@
 (def clojars-poms-directory (str poms-directory "/clojars"))
 (def cache-exists?          (.exists (io/file clojars-poms-directory)))
 
-; REPL state setup...
-(def sync? (when cache-exists?
-             (print "\nCache exists; sync? [y/N] ")
-             (flush)
-             (s/starts-with? (s/lower-case (read-line)) "y")))
+(defn prompt-for-y-or-n?
+  "Prompts the user with a yes or no question, returning a boolean indicating
+  their answer (yes = true)."
+  [msg]
+  (print msg "[y/N] ")
+  (flush)
+  (s/starts-with? (s/lower-case (read-line)) "y"))
 
-(if (and cache-exists?
-         (not sync?))
+(def sync? (when cache-exists? (prompt-for-y-or-n? "\nCache exists; sync?")))
+
+; Sync phase
+(if (and cache-exists? (not sync?))
   (println "ℹ️ Skipping Clojars POM sync")
   (do
     (when-not cache-exists? (println "ℹ️ Cache doesn't exist; will sync all Clojars POMs"))
@@ -63,7 +67,7 @@
     (print "ℹ️ Syncing Clojars POM index... ")
     (flush)
     (pi/animate! (cs/sync-index! clojars-poms-directory))
-    (let [pom-count (cs/pom-count clojars-poms-directory)
+    (let [pom-count (cs/pom-count clojars-poms-directory)  ; Note: pre-synced count - after syncing it may go
           start     (System/currentTimeMillis)]
       (println "\nℹ️" (if cache-exists? "Checking" "Syncing") pom-count "Clojars POMs...")
       (flush)
@@ -77,24 +81,31 @@
                          time-taken
                          (double (/ pom-count time-taken))))))))
 
+; Parse phase
 (print "ℹ️ Counting cached POM files... ")
 
-(let [pom-count (pi/animate! (cp/pom-count poms-directory))
-      start     (System/currentTimeMillis)]
-  (println (str "\nℹ️ Parsing " pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
+(pi/animate!
+  (def total-pom-count  (cs/pom-count clojars-poms-directory))  ; We do this a second time because it may have changed after syncing
+  (def parsed-pom-count (cp/pom-count poms-directory parse-latest-versions-only?)))
+
+(let [start (System/currentTimeMillis)]
+  (println (str "\nℹ️ Parsing " parsed-pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
   (flush)
   (def poms (pd/animate! cp/parse-count
-                         :opts {:total pom-count}
+                         :opts {:total parsed-pom-count}
                          (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
   (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
     (println (format "ℹ️ Done - %d POMs parsed in %ds (%.2f/s)"
-                     pom-count
+                     parsed-pom-count
                      time-taken
-                     (double (/ pom-count time-taken))))))
+                     (double (/ parsed-pom-count time-taken))))))
 
-(println "\nParsed poms (as a sequence of XML zippers) are in var `poms`\n")
+(println "\ndata:")
+(println "  * poms - parsed poms, as a sequence of XML zippers")
+(println "  * total-pom-count - total # of POMs in the local cache")
+(println "  * parsed-pom-count - # of POMs that were parsed (may not= (count poms) due to invalid POMs)")
 
-(println "Handy functions include:")
+(println "\nfns:")
 (println "  * (pom->gav pom-xml-zipper)")
 (println "  * (gav->clojars-url gav-string)")
 (println "  * (find-deps-by-license-name license-name-string)")
