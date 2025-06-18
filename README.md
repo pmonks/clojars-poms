@@ -1,9 +1,9 @@
+# clojars-poms
+
 [![Open Issues](https://img.shields.io/github/issues/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/issues)
 ![GitHub last commit](https://img.shields.io/github/last-commit/pmonks/clojars-poms.svg)
 [![License](https://img.shields.io/github/license/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/blob/master/LICENSE)
-<!-- [![Dependencies Status](https://versions.deps.co/pmonks/clojars-poms/status.svg)](https://versions.deps.co/pmonks/clojars-poms) -->
-
-# clojars-poms
+![Maintained](https://badges.ws/badge/?label=maintained&value=yes,+at+author's+discretion)
 
 A little tool to support analysis of the POMs of projects deployed to Clojars.
 
