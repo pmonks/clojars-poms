@@ -66,13 +66,14 @@
     (io/make-parents clojars-poms-directory)
     (print "ℹ️ Syncing Clojars POM index... ")
     (flush)
-    (pi/animate! (cs/sync-index! clojars-poms-directory))
+    (pi/animate! :opts {:frames (:clocks pi/styles)}
+      (cs/sync-index! clojars-poms-directory))
     (let [pom-count (cs/pom-count clojars-poms-directory)  ; Note: pre-synced count - after syncing it may go
           start     (System/currentTimeMillis)]
       (println "\nℹ️" (if cache-exists? "Checking" "Syncing") pom-count "Clojars POMs...")
       (flush)
       (pd/animate! cs/sync-count
-                   :opts {:total pom-count}
+                   :opts {:total pom-count :style (:emoji-boxes pd/styles)}
                    (cs/sync-clojars-poms! clojars-poms-directory))   ; This takes a loooooong time...
       (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
         (println (format "ℹ️ Done - %d POMs %s in %ds (%.2f/s)"
@@ -84,7 +85,7 @@
 ; Parse phase
 (print "ℹ️ Counting cached POM files... ")
 
-(pi/animate!
+(pi/animate! :opts {:frames (:clocks pi/styles)}
   (def total-pom-count  (cs/pom-count clojars-poms-directory))  ; We do this a second time because it may have changed after syncing
   (def parsed-pom-count (cp/pom-count poms-directory parse-latest-versions-only?)))
 
@@ -92,7 +93,7 @@
   (println (str "\nℹ️ Parsing " parsed-pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
   (flush)
   (def poms (pd/animate! cp/parse-count
-                         :opts {:total parsed-pom-count}
+                         :opts {:total parsed-pom-count :style (:emoji-boxes pd/styles)}
                          (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
   (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
     (println (format "ℹ️ Done - %d POMs parsed in %ds (%.2f/s)"
