@@ -73,7 +73,9 @@
       (println "\nℹ️" (if cache-exists? "Checking" "Syncing") pom-count "Clojars POMs...")
       (flush)
       (pd/animate! cs/sync-count
-                   :opts {:total pom-count :style (:emoji-boxes pd/styles)}
+                   :opts {:total       pom-count
+                          :redraw-rate 30
+                          :style       (:coloured-ascii-boxes pd/styles)}
                    (cs/sync-clojars-poms! clojars-poms-directory))   ; This takes a loooooong time...
       (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
         (println (format "ℹ️ Done - %d POMs %s in %ds (%.2f/s)"
@@ -93,7 +95,9 @@
   (println (str "\nℹ️ Parsing " parsed-pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
   (flush)
   (def poms (pd/animate! cp/parse-count
-                         :opts {:total parsed-pom-count :style (:emoji-boxes pd/styles)}
+                         :opts {:total       parsed-pom-count
+                                :redraw-rate 30
+                                :style       (:coloured-ascii-boxes pd/styles)}
                          (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
   (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
     (println (format "ℹ️ Done - %d POMs parsed in %ds (%.2f/s)"
