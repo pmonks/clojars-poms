@@ -115,6 +115,10 @@
 (println "  * (gav->clojars-url gav-string)")
 (println "  * (find-deps-by-license-name license-name-string)")
 (println "  * (find-deps-containing-fragment-in-name license-fragment-string)")
+
+(println "\nexample handy exps:")
+(println "  * (sort (distinct (filter (complement s/blank?) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms))))")
+
 (println)
 
 ; Handy utility fns

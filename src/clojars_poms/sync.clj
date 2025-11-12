@@ -75,7 +75,7 @@
   "Try f up to n times, with optional sleep in between - adapted from
   https://ericnormand.me/article/try-three-times"
   ([f n] (try-n-times f n 0))
-  ([f n sleep-ms]
+  ([f n ^long sleep-ms]
     (if (zero? (dec n))
       (f)
       (try

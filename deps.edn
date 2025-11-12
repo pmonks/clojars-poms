@@ -22,14 +22,14 @@
         org.clojure/data.zip             {:mvn/version "1.1.0"}
         hato/hato                        {:mvn/version "1.0.0"}
         version-clj/version-clj          {:mvn/version "2.0.3"}
-        org.owasp/dependency-check-maven {:mvn/version "12.1.8"}
+        org.owasp/dependency-check-maven {:mvn/version "12.1.9"}  ; Note: this has some seriously old transitive dependencies that break tools.deps - see https://github.com/dependency-check/DependencyCheck/issues/7566
         aysylu/loom                      {:mvn/version "1.0.2"}
-        ch.qos.logback/logback-classic   {:mvn/version "1.5.19"}
+        ch.qos.logback/logback-classic   {:mvn/version "1.5.21"}
         org.slf4j/slf4j-api              {:mvn/version "2.0.17"}
         org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.17"}
         org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.17"}
         org.slf4j/jul-to-slf4j           {:mvn/version "2.0.17"}
-        com.github.pmonks/spinner        {:mvn/version "2.0.284"}
+        com.github.pmonks/spinner        {:mvn/version "2.0.297"}
         com.github.pmonks/embroidery     {:mvn/version "1.0.44"}}
  :aliases {
     ; clj -M:check
