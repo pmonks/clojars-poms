@@ -35,18 +35,16 @@
 (require '[loom.graph             :as g])
 (require '[loom.alg               :as galg])
 (require '[loom.io                :as gio])
-(require '[clojars-poms.sync      :as cs] :reload-all)
-(require '[clojars-poms.parse     :as cp] :reload-all)
+(require '[clojars-poms.cache     :as cc])
+(require '[clojars-poms.index     :as ci])
+(require '[clojars-poms.parse     :as cpa])
+(require '[clojars-poms.poms      :as cpo])
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
 
 ; Controls whether only the POM of the latest version of each artifact is parsed
 ; Turning this off will substantially increase memory usage
-(def parse-latest-versions-only? true)
-
-(def poms-directory         "./poms")
-(def clojars-poms-directory (str poms-directory "/clojars"))
-(def cache-exists?          (.exists (io/file clojars-poms-directory)))
+(def latest-versions-only? true)
 
 (defn prompt-for-y-or-n?
   "Prompts the user with a yes or no question, returning a boolean indicating
@@ -56,85 +54,92 @@
   (flush)
   (s/starts-with? (s/lower-case (read-line)) "y"))
 
-(def sync? (when cache-exists? (prompt-for-y-or-n? "\nCache exists; sync?")))
+(def sync? (boolean (or (not (cc/exists?))
+                        (not (ci/exists?))
+                        (prompt-for-y-or-n? "\nCache exists; sync?"))))
 
-; Sync phase
-(if (and cache-exists? (not sync?))
-  (println "ℹ️ Skipping Clojars POM sync")
-  (do
-    (when-not cache-exists? (println "ℹ️ Cache doesn't exist; will sync all Clojars POMs"))
-    (io/make-parents clojars-poms-directory)
-    (print "ℹ️ Syncing Clojars POM index... ")
-    (flush)
-    (pi/animate! :opts {:frames (:clocks pi/styles)}
-      (cs/sync-index! clojars-poms-directory))
-    (let [pom-count (cs/pom-count clojars-poms-directory)  ; Note: pre-synced count - after syncing it may go
-          start     (System/currentTimeMillis)]
-      (println "\nℹ️" (if cache-exists? "Checking" "Syncing") pom-count "Clojars POMs...")
-      (flush)
-      (pd/animate! cs/sync-count
-                   :opts {:total       pom-count
-                          :redraw-rate 30
-                          :style       (:coloured-ascii-boxes pd/styles)}
-                   (cs/sync-clojars-poms! clojars-poms-directory))   ; This takes a loooooong time...
-      (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
-        (println (format "ℹ️ Done - %d POMs %s in %ds (%.2f/s)"
-                         pom-count
-                         (if cache-exists? "checked" "synced")
-                         time-taken
-                         (double (/ pom-count time-taken))))))))
+; Sync index
+(when sync?
+  (when-not (cc/exists?)
+    (println "ℹ️ Cache doesn't exist; creating it")
+    (cc/create!))
+  (print "ℹ️ Syncing Clojars POM index... ")
+  (pi/animate! :opts {:frames (:clocks pi/styles)}
+    (ci/sync!))
+  (println))
 
-; Parse phase
-(print "ℹ️ Counting cached POM files... ")
-
+; Count how many POMs we'll be syncing & parsing
+(print "ℹ️ Counting" (if latest-versions-only? "latest" "all") "POMs in index... ")
 (pi/animate! :opts {:frames (:clocks pi/styles)}
-  (def total-pom-count  (cs/pom-count clojars-poms-directory))  ; We do this a second time because it may have changed after syncing
-  (def parsed-pom-count (cp/pom-count poms-directory parse-latest-versions-only?)))
-
-(let [start (System/currentTimeMillis)]
-  (println (str "\nℹ️ Parsing " parsed-pom-count " POMs " (if parse-latest-versions-only? "(latest version of each artifact only)" "(all versions of all artifacts)") "... "))
-  (flush)
-  (def poms (pd/animate! cp/parse-count
-                         :opts {:total       parsed-pom-count
-                                :redraw-rate 30
-                                :style       (:coloured-ascii-boxes pd/styles)}
-                         (doall (cp/parse-pom-files poms-directory parse-latest-versions-only?))))
-  (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
-    (println (format "ℹ️ Done - %d POMs parsed in %ds (%.2f/s)"
-                     parsed-pom-count
-                     time-taken
-                     (double (/ parsed-pom-count time-taken))))))
-
-(println "\ndata:")
-(println "  * poms - parsed poms, as a sequence of XML zippers")
-(println "  * total-pom-count - total # of POMs in the local cache")
-(println "  * parsed-pom-count - # of POMs that were parsed (may not= (count poms) due to invalid POMs)")
-
-(println "\nfns:")
-(println "  * (pom->gav pom-xml-zipper)")
-(println "  * (gav->clojars-url gav-string)")
-(println "  * (find-deps-by-license-name license-name-string)")
-(println "  * (find-deps-containing-fragment-in-name license-fragment-string)")
-
-(println "\nexample handy exps:")
-(println "  * (sort (distinct (filter (complement s/blank?) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms))))")
-
+  (def pom-count (ci/pom-count latest-versions-only?)))
 (println)
 
+; Sync POMs
+(if sync?
+  (let [start (System/currentTimeMillis)]
+    (println "ℹ️ Syncing" pom-count "POMs from Clojars" (if latest-versions-only? "(latest only)..." "(all)..."))
+    (flush)
+    (pd/animate! cpo/sync-count
+                 :opts {:total       pom-count
+                        :redraw-rate 30
+                        :style       (:coloured-ascii-boxes pd/styles)}
+                 (cpo/sync! latest-versions-only?))   ; This can take a while, though a JVM with virtual thread support helps...
+    (let [time-taken (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))]
+      (println (format "ℹ️ Done - %d POMs synced in %ds (%.2f/s)"
+                       pom-count
+                       time-taken
+                       (double (/ pom-count time-taken))))))
+  (println "ℹ️ Skipping Clojars POM sync"))
+
+; Parse POMs from disk
+(let [start (System/currentTimeMillis)]
+  (println (str "ℹ️ Parsing " pom-count " POMs " (if latest-versions-only? "(latest only)..." "(all)...")))
+  (flush)
+  (def poms (pd/animate! cpa/parse-count
+                         :opts {:total       pom-count
+                                :redraw-rate 30
+                                :style       (:coloured-ascii-boxes pd/styles)}
+                         (doall (cpa/parse latest-versions-only?))))
+  (let [time-taken       (long (Math/ceil (/ (- (System/currentTimeMillis) start) 1000)))
+        parsed-pom-count (count poms)]
+    (println (format "ℹ️ Done - %d POMs parsed (✅: %d, ❌: %d) in %ds (%.2f/s)"
+                     pom-count
+                     parsed-pom-count
+                     (- pom-count parsed-pom-count)
+                     time-taken
+                     (double (/ pom-count time-taken))))))
+
 ; Handy utility fns
-(defn pom->gav
-  "Returns the GAV (as a String) of the given POM xml."
-  [pom-xml]
-  (when pom-xml
-    (str (zip-xml/xml1-> pom-xml :groupId zip-xml/text)
-         "/"
-         (zip-xml/xml1-> pom-xml :artifactId zip-xml/text)
-         "@"
-         (zip-xml/xml1-> pom-xml :version zip-xml/text))))
+(defn gav-map
+  "Returns the GAV (as a Map) of the given XML element. The map has some or all
+  of these keys:
+
+  * :group-id - String
+  * :artifact-id - String
+  * :version - String"
+  [elem]
+  (when elem
+    (let [group-id    (zip-xml/xml1-> elem :groupId    zip-xml/text)
+          artifact-id (zip-xml/xml1-> elem :artifactId zip-xml/text)
+          version     (zip-xml/xml1-> elem :version    zip-xml/text)]
+      (merge {}
+             (when-not (s/blank? group-id)    {:group-id    group-id})
+             (when-not (s/blank? artifact-id) {:artifact-id artifact-id})
+             (when-not (s/blank? version)     {:version     version})))))
+
+(defn gav
+  "Returns the GAV (as a String) of the given XML element."
+  [elem]
+  (when-let [{group-id    :group-id
+              artifact-id :artifact-id
+              version     :version} (gav-map elem)]
+    (str (when group-id    (str group-id "/"))
+         (when artifact-id artifact-id)
+         (when version     (str "@" version)))))
 
 (defn gav->clojars-url
   "Returns the Clojars URL of the *directory* containing the POM for the given
-  GAV."
+  GAV (a String in groupId/artifactId@version format)."
   [gav]
   (when-not (s/blank? gav)
     (let [[ga v] (s/split gav #"@")
@@ -143,11 +148,18 @@
            (s/replace g "." "/")
            "/" a "/" v "/"))))
 
+(def dependencies (apply merge (map #(let [gav  (gav-map %)
+                                           deps (map gav-map (zip-xml/xml-> % :dependencies :dependency))]
+                                       {gav deps})
+                                    poms)))
+
+;(def inverted-dependencies ....####TODO)
+
 (defn find-deps-by-license-name
   "Find all deps with the given license name"
   [lic]
   (when-not (s/blank? lic)
-    (some-> (map pom->gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) poms))
+    (some-> (map gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) poms))
             seq
             set)))
 
@@ -155,9 +167,30 @@
   "Find all deps with the given fragment in the license name"
   [fragment]
   (when-not (s/blank? fragment)
-    (some-> (map pom->gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) poms))
+    (some-> (map gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) poms))
             seq
             set)))
+
+; Print help on startup
+(defn help
+  []
+  (println "\ndata:")
+  (println "  * poms - parsed poms, as a sequence of XML zippers")
+  (println "  * dependencies - map of dependencies, where each key is a GAV string and each value is a sequence of GAV maps it depends on")
+  ;(println "  * inverse-dependencies - sequence of dependencies, expressed as ####")
+
+  (println "\nfns:")
+  (println "  * (gav-map xml)")
+  (println "  * (gav xml)")
+  (println "  * (gav->clojars-url gav-string)")
+  (println "  * (find-deps-by-license-name license-name-string)")
+  (println "  * (find-deps-containing-fragment-in-name license-fragment-string)")
+
+  (println "\nexample handy exps:")
+  (println "  * (sort (distinct (filter (complement s/blank?) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms))))")
+
+  (println "\nUse (help) to see this message at any time.\n"))
+(help)
 
 ; Get all license names & URLs
 ;(def license-names (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms)))
