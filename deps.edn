@@ -1,19 +1,11 @@
 ;
 ; Copyright © 2019 Peter Monks
 ;
-; Licensed under the Apache License, Version 2.0 (the "License");
-; you may not use this file except in compliance with the License.
-; You may obtain a copy of the License at
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ;
-;     http://www.apache.org/licenses/LICENSE-2.0
-;
-; Unless required by applicable law or agreed to in writing, software
-; distributed under the License is distributed on an "AS IS" BASIS,
-; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-; See the License for the specific language governing permissions and
-; limitations under the License.
-;
-; SPDX-License-Identifier: Apache-2.0
+; SPDX-License-Identifier: MPL-2.0
 ;
 
 {:paths ["src" "resources"]
@@ -22,8 +14,7 @@
         org.clojure/data.zip             {:mvn/version "1.1.1"}
         hato/hato                        {:mvn/version "1.0.0"}
         version-clj/version-clj          {:mvn/version "2.0.3"}
-        org.owasp/dependency-check-maven {:mvn/version "12.1.9"}  ; Note: this has some seriously old transitive dependencies that break tools.deps - see https://github.com/dependency-check/DependencyCheck/issues/7566
-        aysylu/loom                      {:mvn/version "1.0.2"}
+        org.owasp/dependency-check-maven {:mvn/version "12.1.9"}
         ch.qos.logback/logback-classic   {:mvn/version "1.5.23"}
         org.slf4j/slf4j-api              {:mvn/version "2.0.17"}
         org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.17"}
@@ -44,6 +35,6 @@
        :main-opts  ["-m" "clj-kondo.main" "--lint" "src" "resources"]}
     ; clj -M:eastwood
     :eastwood
-      {:extra-deps {jonase/eastwood {:mvn/version "1.4.3"}}
+      {:extra-deps {jonase/eastwood {:mvn/version "RELEASE"}}
        :main-opts  ["-m" "eastwood.lint" {:source-paths ["src" "resources"]}]}
     }}

@@ -2,7 +2,7 @@
 
 [![Open Issues](https://img.shields.io/github/issues/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/issues)
 ![GitHub last commit](https://img.shields.io/github/last-commit/pmonks/clojars-poms.svg)
-[![License](https://img.shields.io/github/license/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/pmonks/clojars-poms.svg)](https://github.com/pmonks/clojars-poms/blob/main/LICENSE)
 ![Maintained](https://badges.ws/badge/?label=maintained&value=yes,+at+author's+discretion)
 
 A little tool to support analysis of the POMs of projects deployed to Clojars.
@@ -19,7 +19,7 @@ $ clojure -M -i repl-init.clj -r
 
 Note: the `repl-init.clj` script uses the [spinner](https://github.com/pmonks/spinner) library, which isn't compatible with the `clj` command line script (more specifically, it isn't compatible with `rlwrap`, which `clj` uses).  The incompatibilities are only cosmetic though, so if you'd rather have an ergonomic REPL experience, it's fine to use `clj` and just be ready for strange output while Clojars POMs are being synced and parsed.
 
-The `repl-init.clj` script will print some helpful information about what it has populated and what functions are available for interrogating the parsed POMs. You can see this information at any time by calling the `(help)` fn. You can also look at [`repl-init.clj`](https://github.com/pmonks/clojars-poms/blob/master/repl-init.clj) for various examples.
+The `repl-init.clj` script will print some helpful information about what it has populated and what functions are available for interrogating the parsed POMs. You can see this information at any time by calling the `(help)` fn. You can also look at [`repl-init.clj`](https://github.com/pmonks/clojars-poms/blob/main/repl-init.clj) for various examples.
 
 ### IMPORTANT NOTE ABOUT DATA USAGE
 
@@ -37,6 +37,6 @@ The `repl-init.clj` script will print some helpful information about what it has
 
 Copyright © 2019 Peter Monks (pmonks@gmail.com)
 
-Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+Distributed under the [Mozilla Public License, version 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
 
-SPDX-License-Identifier: [Apache-2.0](https://spdx.org/licenses/Apache-2.0)
+SPDX-License-Identifier: [`MPL-2.0`](https://spdx.org/licenses/MPL-2.0)

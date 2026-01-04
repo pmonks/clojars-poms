@@ -1,40 +1,30 @@
 ;
 ; Copyright 2019 Peter Monks
 ;
-; Licensed under the Apache License, Version 2.0 (the "License");
-; you may not use this file except in compliance with the License.
-; You may obtain a copy of the License at
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ;
-;     http://www.apache.org/licenses/LICENSE-2.0
-;
-; Unless required by applicable law or agreed to in writing, software
-; distributed under the License is distributed on an "AS IS" BASIS,
-; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-; See the License for the specific language governing permissions and
-; limitations under the License.
-;
-; SPDX-License-Identifier: Apache-2.0
-
-;
-; This script is intended to be used to initialise a clj REPL set up for easy experimentation with this project.
-;
-; Use:
-;
-;     clojure -i repl-init.clj -r
-;
-; Note: do NOT use `clj` to run this script, or you will see strange output behaviour
+; SPDX-License-Identifier: MPL-2.0
 ;
 
-(require '[clojure.pprint         :as pp :refer [pprint]])
+;
+; This script is intended to be used to initialise a REPL set up for easy
+; experimentation with this project. e.g.:
+;
+;     clojure -M -i repl-init.clj -r
+;
+; Note: if you use `clj` to run this script, you may see strange output
+; behaviour
+;
+
+(require '[clojure.pprint         :as pp])
 (require '[clojure.string         :as s])
 (require '[clojure.java.io        :as io])
 (require '[clojure.xml            :as xml])
 (require '[clojure.zip            :as zip])
 (require '[clojure.data.zip.xml   :as zip-xml])
 (require '[version-clj.core       :as ver])
-(require '[loom.graph             :as g])
-(require '[loom.alg               :as galg])
-(require '[loom.io                :as gio])
 (require '[clojars-poms.cache     :as cc])
 (require '[clojars-poms.index     :as ci])
 (require '[clojars-poms.parse     :as cpa])
@@ -42,8 +32,9 @@
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
 
-; Controls whether only the POM of the latest version of each artifact is parsed
-; Turning this off will substantially increase memory usage
+; Controls whether only the POM of the latest version of each artifact is synced
+; and parsed.  Setting this to false will substantially increase running time,
+; disk usage, and memory usage.
 (def latest-versions-only? true)
 
 (defn prompt-for-y-or-n?
@@ -234,30 +225,3 @@
 ;(spit "poms-without-licenses.txt" (s/join "\n" (sort (map #(cp/gav->string (cp/gav %)) poms-without-licenses))))
 
 
-
-
-
-;(def latest-versions-only (cp/latest-project-versions poms))
-;(println "ℹ️ Found" (count latest-versions-only) "unique projects")
-
-;(def dependencies (cp/dependencies latest-versions-only))
-;(println "ℹ️ Found" (count dependencies) "unique dependencies amongst latest versions")
-
-
-; Experiments go here...
-
-;(def inverted-dependencies (group-by second dependencies))   ; This isn't correct...
-;(def sample-library "version-clj/version-clj")
-;(def consumers (seq (sort (map first (get inverted-dependencies sample-library)))))
-
-;(println "ℹ️ Consumers of" (str sample-library ":\n") (if consumers (doall (map (partial println "* ") consumers)) "- none -"))
-;(println "ℹ️ Top 25 most depended-upon projects:\n *" (s/join "\n * " (take 25 (map first (sort-by #(count (val %)) > inverted-dependencies)))))
-
-; Build a Loom graph
-;(def g (apply g/digraph dependencies))
-
-;(println "ℹ️ Dependencies are a DAG?" (galg/dag? g))
-
-;(def g (apply g/digraph edges))
-
-;(graphio/view g)   ; Warning: this takes a *VERY* long time on a data set of this size...

@@ -1,7 +1,7 @@
 SPDXVersion: SPDX-2.3
 DataLicense: CC0-1.0
 Creator: Peter Monks
-PackageName: clojars-dependencies
+PackageName: clojars-poms
 PackageOriginator: Peter Monks
-PackageHomePage: https://github.com/pmonks/clojars-dependencies
-PackageLicenseDeclared: Apache-2.0
+PackageHomePage: https://github.com/pmonks/clojars-poms
+PackageLicenseDeclared: MPL-2.0
