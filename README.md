@@ -25,6 +25,8 @@ The `repl-init.clj` script will print some helpful information about what it has
 
 **The first time this script is run it will sync POMs from clojars.org and cache them locally.**  As of early 2026, this is ~32,000 POM files (plus the same number of metadata files for caching purposes) totalling ~300MB.  On subsequent runs it will be a lot faster, both because you will be prompted whether to refresh the cache at all, and if you elect to do so, HTTP etag requests will be used to pull only what's new or modified.
 
+Note that if you set `latest-versions-only?` to `false` in `repl-init.clj` this will balloon to ~310,000 files and ~2.8GB, and the syncing and parsing time will dramatically increase.
+
 **Please limit how often you re-sync poms from Clojars!**  They provide a wonderful service to the Clojure community for free, but someone is paying for their bandwidth and those folks deserve our respect!
 
 ## Developer Information
