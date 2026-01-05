@@ -44,7 +44,7 @@
                         (not (ci/exists?))
                         (prompt-for-y-or-n? "\nCache exists; sync?"))))
 
-(def latest-versions-only? (not (prompt-for-y-or-n? "Download all versions of all POMs (WARNING: answering Y will dramatically increase runtime and disk and memory usage)?")))
+(def latest-versions-only? (not (prompt-for-y-or-n? (str (if sync? "Sync & parse" "Parse") " all versions of all POMs" (when sync? " (WARNING: answering Y will dramatically increase runtime and disk and memory usage)") "?"))))
 
 ; Sync index
 (when sync?
