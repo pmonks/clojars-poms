@@ -32,11 +32,6 @@
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
 
-; Controls whether only the POM of the latest version of each artifact is synced
-; and parsed.  Setting this to false will substantially increase running time,
-; disk usage, and memory usage.
-(def latest-versions-only? true)
-
 (defn prompt-for-y-or-n?
   "Prompts the user with a yes or no question, returning a boolean indicating
   their answer (yes = true)."
@@ -48,6 +43,8 @@
 (def sync? (boolean (or (not (cc/exists?))
                         (not (ci/exists?))
                         (prompt-for-y-or-n? "\nCache exists; sync?"))))
+
+(def latest-versions-only? (not (prompt-for-y-or-n? "Download all versions of all POMs (WARNING: answering Y will dramatically increase runtime and disk and memory usage)?")))
 
 ; Sync index
 (when sync?
