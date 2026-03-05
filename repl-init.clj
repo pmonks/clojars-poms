@@ -176,6 +176,7 @@
 
   (println "\nexample handy exps:")
   (println "  * (sort (distinct (filter (complement s/blank?) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms))))")
+  (println "  * (frequencies (filter (complement s/blank?) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms)))")
 
   (println "\nUse (help) to see this message at any time.\n"))
 (help)
