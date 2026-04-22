@@ -18,6 +18,8 @@
 ; behaviour
 ;
 
+(in-ns 'user)
+
 (require '[clojure.pprint         :as pp])
 (require '[clojure.string         :as s])
 (require '[clojure.java.io        :as io])
@@ -179,47 +181,57 @@
   (println "  * (frequencies (filter (complement s/blank?) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms)))")
 
   (println "\nUse (help) to see this message at any time.\n"))
+
 (help)
 
-; Get all license names & URLs
-;(def license-names (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms)))
-;(def license-urls  (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url  zip-xml/text) poms)))
-
-; Distinct license names (as a set)
-;(def distinct-license-names (some-> (distinct license-names) seq set))
-
+(comment
 ; Find dependencies with a specific license name
-;(find-deps-by-license-name "MIT/Apache-2.0/BSD-3-Clause")
+(find-deps-by-license-name "MIT/Apache-2.0/BSD-3-Clause")
 
+; Get license names & URLs
+(def license-names (sort-by s/trim (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :name zip-xml/text) poms))))
+(def license-urls  (sort-by s/trim (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license :url  zip-xml/text) poms))))
+
+; Unique license names & URLs
+(def unique-license-names (distinct license-names))
+(def unique-license-urls  (distinct license-urls))
+
+; Write unique license names & URLs to an EDN file
+(with-open [w (io/writer (io/file "clojars-licenses.edn"))]
+  (pp/pprint {:names unique-license-names :urls unique-license-urls} w))
+)
+
+(comment
+; Write unique license names & URLs to lice-comb unit test
+(with-open [w (io/writer (io/file "lice-comb-tests.clj"))]
+  (run! #(.write w (str "    (is (valid= #{\"\"} (name->expressions \"" (s/escape % {\" "\\\""}) "\")))\n")) unique-license-names)
+  (.write w "\n")
+  (run! #(.write w (str "    (is (valid= #{\"\"} (uri->expressions \"" (s/escape % {\" "\\\""}) "\")))\n")) unique-license-urls))
+)
+
+(comment
 ; How many POMs have a license name
-;(count license-names)
+(count license-names)
 
 ; How many unique license names
-;(count (distinct license-names))
+(count (distinct license-names))
 
 ; Frequencies
-;(sort-by second (frequencies license-names))
+(sort-by second (frequencies license-names))
 
 ; 10 most common license names
-;(pprint (take 10 (reverse (sort-by second (frequencies license-names)))))
+(pp/pprint (take 10 (reverse (sort-by second (frequencies license-names)))))
 
 ; Distinct names
-;(sort (distinct license-names))
-
-; Save distinct names and URLs to file
-;(spit (io/file "license-names.txt") (s/join "\n" (sort (distinct license-names))))
-;(spit (io/file "license-urls.txt")  (s/join "\n" (sort (distinct license-urls))))
-
-
-
+(sort (distinct license-names))
 
 ; Count how many have a license
-;(count (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license zip-xml/text) poms)))
+(count (filter #(not (s/blank? %)) (map #(zip-xml/xml1-> % :licenses :license zip-xml/text) poms)))
 
 ; poms without licenses
-;(def poms-without-licenses (doall (filter #(s/blank? (zip-xml/xml1-> % :licenses :license zip-xml/text)) poms)))
+(def poms-without-licenses (filter #(s/blank? (zip-xml/xml1-> % :licenses :license zip-xml/text)) poms))
 
-; dump poms without licenses to a file
-;(spit "poms-without-licenses.txt" (s/join "\n" (sort (map #(cp/gav->string (cp/gav %)) poms-without-licenses))))
+(sort (map gav poms-without-licenses))   ; Note: large output, which rlwrap barfs on
 
+)
 
