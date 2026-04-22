@@ -21,7 +21,9 @@
         org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.17"}
         org.slf4j/jul-to-slf4j           {:mvn/version "2.0.17"}
         com.github.pmonks/spinner        {:mvn/version "2.0.297"}
-        com.github.pmonks/embroidery     {:mvn/version "1.0.44"}}
+        com.github.pmonks/embroidery     {:mvn/version "1.0.44"}
+        com.github.pmonks/wreck          {:mvn/version "1.0.151"}
+        com.github.pmonks/rencg          {:mvn/version "1.0.90"}}
  :aliases {
     ; clj -M:check
     :check    {:extra-deps {com.github.athos/clj-check {:git/sha "d997df866b2a04b7ce7b17533093ee0a2e2cb729"}}

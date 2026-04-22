@@ -33,6 +33,8 @@
 (require '[clojars-poms.poms      :as cpo])
 (require '[progress.indeterminate :as pi])
 (require '[progress.determinate   :as pd])
+(require '[wreck.api              :as re])
+(require '[rencg.api              :as ncg])
 
 (defn prompt-for-y-or-n?
   "Prompts the user with a yes or no question, returning a boolean indicating
@@ -145,21 +147,37 @@
 
 ;(def inverted-dependencies ....####TODO)
 
-(defn find-deps-by-license-name
-  "Find all deps with the given license name"
-  [lic]
-  (when-not (s/blank? lic)
-    (some-> (map gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) poms))
+(defn find-deps-by-license
+  "Find all deps where the given re 'finds' within the license name."
+  [re]
+  (when re
+    (some-> (map gav (filter #(when-let [license-name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)]
+                                (ncg/re-find re license-name))
+                             poms))
             seq
             set)))
 
+(defn find-deps-by-license-name
+  "Find all deps with the given license name (case insensitively)."
+  [lic]
+  (when-not (s/blank? lic)
+    (find-deps-by-license (re/fgrp "i" #"\A" (re/esc lic) #"\z"))))
+
+;  (when-not (s/blank? lic)
+;    (some-> (map gav (filter #(= lic (zip-xml/xml1-> % :licenses :license :name zip-xml/text)) poms))
+;            seq
+;            set)))
+
 (defn find-deps-containing-fragment-in-name
-  "Find all deps with the given fragment in the license name"
+  "Find all deps with the given fragment in the license name (case insensitively)."
   [fragment]
   (when-not (s/blank? fragment)
-    (some-> (map gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) poms))
-            seq
-            set)))
+    (find-deps-by-license (re/fgrp "i" (re/esc fragment)))))
+
+;  (when-not (s/blank? fragment)
+;    (some-> (map gav (filter #(when-let [name (zip-xml/xml1-> % :licenses :license :name zip-xml/text)] (s/includes? name fragment)) poms))
+;            seq
+;            set)))
 
 ; Print help on startup
 (defn help
@@ -173,6 +191,7 @@
   (println "  * (gav-map xml)")
   (println "  * (gav xml)")
   (println "  * (gav->clojars-url gav-string)")
+  (println "  * (find-deps-by-license re)")
   (println "  * (find-deps-by-license-name license-name-string)")
   (println "  * (find-deps-containing-fragment-in-name license-fragment-string)")
 
