@@ -9,17 +9,17 @@
 ;
 
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure              {:mvn/version "1.12.4"}
+ :deps {org.clojure/clojure              {:mvn/version "1.12.5"}
         org.clojure/tools.logging        {:mvn/version "1.3.1"}
         org.clojure/data.zip             {:mvn/version "1.1.1"}
         hato/hato                        {:mvn/version "1.0.0"}
         version-clj/version-clj          {:mvn/version "2.0.3"}
-        org.owasp/dependency-check-maven {:mvn/version "12.2.1"}
-        ch.qos.logback/logback-classic   {:mvn/version "1.5.32"}
-        org.slf4j/slf4j-api              {:mvn/version "2.0.17"}
-        org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.17"}
-        org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.17"}
-        org.slf4j/jul-to-slf4j           {:mvn/version "2.0.17"}
+        org.owasp/dependency-check-maven {:mvn/version "13.0.0"}
+        ch.qos.logback/logback-classic   {:mvn/version "1.6.3"}
+        org.slf4j/slf4j-api              {:mvn/version "2.0.18"}
+        org.slf4j/jcl-over-slf4j         {:mvn/version "2.0.18"}
+        org.slf4j/log4j-over-slf4j       {:mvn/version "2.0.18"}
+        org.slf4j/jul-to-slf4j           {:mvn/version "2.0.18"}
         com.github.pmonks/spinner        {:mvn/version "2.0.297"}
         com.github.pmonks/embroidery     {:mvn/version "1.0.44"}
         com.github.pmonks/wreck          {:mvn/version "1.0.151"}
